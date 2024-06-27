@@ -1,0 +1,7 @@
+.vs
+*.o
+*.exe
+*/Debug/*
+*/Release/*
+*/x64/*
+out/

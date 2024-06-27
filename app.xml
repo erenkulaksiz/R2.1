@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<application>
+	<scenes>
+		<scene name="TestScene">
+			<object name="TestCube" file="/resources/testcube.obj" posX="0" posY="0" posZ="0" type="mesh" />
+			<object name="TestCube2" file="/resources/testcube.obj" posX="0" posY="5" posZ="0" type="mesh" />
+			<object name="GroupTest" file="/resources/grouptest.obj" posX="6" posY="6" posZ="6" type="mesh" />
+			<object name="Cybertruck" file="/resources/Cybertruck.obj" posX="20" posY="0" posZ="0" type="mesh" />
+		</scene>
+	</scenes>
+	<config>
+		<item name="width" value="920" />
+	</config>
+</application>
