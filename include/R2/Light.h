@@ -55,8 +55,8 @@ namespace R2
     float m_intensity = 1.0f;
     GLuint m_depthMapFBO;
     GLuint m_depthMap;
-    int m_shadowWidth = 512;
-    int m_shadowHeight = 512;
+    int m_shadowWidth = 1024;
+    int m_shadowHeight = 1024;
     glm::mat4 m_lightSpaceMatrix;
     glm::mat4 m_lightView;
     glm::mat4 m_lightProjection;

@@ -41,24 +41,33 @@ void R2::TestScene::setup()
   p_billboardMesh->setup();
   addMesh(p_billboardMesh);
 
-  Light *p_light = new Light(m_papplication);
-  p_light->setPosition(glm::vec3(-2.0f));
-  p_light->setIsPointLight(true);
-  p_light->setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-  p_light->setName("PointLight");
-  p_light->setup();
-  addMesh(p_light);
+  Light *p_lightR = new Light(m_papplication);
+  p_lightR->setPosition(glm::vec3(-2.0f));
+  p_lightR->setIsPointLight(true);
+  p_lightR->setColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+  p_lightR->setName("RedPointLight");
+  p_lightR->setup();
+  addMesh(p_lightR);
+
+  Light* p_lightB = new Light(m_papplication);
+  p_lightB->setPosition(glm::vec3(-2.0f));
+  p_lightB->setIsPointLight(true);
+  p_lightB->setColor(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+  p_lightB->setName("BluePointLight");
+  p_lightB->setup();
+  addMesh(p_lightB); 
 
   /*
-    Light *p_directionalLight = new Light(m_papplication);
-    p_directionalLight->setIsDirectionalLight(true);
-    p_directionalLight->setDirection(glm::vec3(-1.0f, -1.0f, 0.0f));
-    p_directionalLight->setPosition(glm::vec3(0.0f, 20.0f, 0.0f));
-    p_directionalLight->setAmbient(glm::vec3(0.0f, 0.0f, 0.0f));
-    p_directionalLight->setColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    p_directionalLight->setName("DirectionalLight");
-    p_directionalLight->setup();
-    addMesh(p_directionalLight);*/
+	Light* p_directionalLight = new Light(m_papplication);
+	p_directionalLight->setIsDirectionalLight(true);
+	p_directionalLight->setDirection(glm::vec3(-1.0f, -1.0f, 0.0f));
+	p_directionalLight->setPosition(glm::vec3(0.0f, 20.0f, 0.0f));
+	p_directionalLight->setAmbient(glm::vec3(0.0f, 0.0f, 0.0f));
+	p_directionalLight->setColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	p_directionalLight->setName("DirectionalLight");
+	p_directionalLight->setup();
+	addMesh(p_directionalLight);
+  */
 
   m_isSetup = true;
   m_isStartedSetup = false;

@@ -157,7 +157,7 @@ void R2::Light::updateShadowMap(Shader *p_shader, Camera *p_camera)
     std::cout << "R2::Light::updateShadowMap() - Shader is not valid" << std::endl;
     return;
   }
-
+  
   if (m_isDirectionalLight)
   {
     m_lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 30.0f);

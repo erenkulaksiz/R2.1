@@ -8,6 +8,7 @@ in vec4 FragPosLightSpace;
 struct Material {
   sampler2D diffuse;
   sampler2D specular;
+  sampler2D normal;
   float shininess;
 };
 
@@ -56,7 +57,7 @@ float DirectLightShadowCalculation(vec4 fragPosLightSpace, sampler2D shadowMap) 
   if(projCoords.z > 1.0)
     return 1.0;
 
-  float bias = 0.005;
+  float bias = 0.010;
   float shadow = 0.0;
   vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
 
@@ -72,17 +73,28 @@ float DirectLightShadowCalculation(vec4 fragPosLightSpace, sampler2D shadowMap) 
 }
 
 float PointLightShadowCalculation(PointLight light, vec3 fragPos) {
-  vec3 fragToLight = fragPos - light.position;
-  float currentDepth = length(fragToLight);
+    vec3 fragToLight = fragPos - light.position;
+    float currentDepth = length(fragToLight);
+    vec3 lightSpaceCoords = normalize(fragToLight);
 
-  vec3 lightSpaceCoords = normalize(fragToLight);
+    float bias = 0.05;
+    float shadow = 0.0;
+    float samples = 0.0;
 
-  float closestDepth = texture(light.shadowMap, lightSpaceCoords).r;
-  closestDepth *= light.farPlane;
-
-  float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
-
-  return shadow;
+    int sampleSize = 2;
+    for (int x = -sampleSize; x <= sampleSize; ++x) {
+        for (int y = -sampleSize; y <= sampleSize; ++y) {
+            for (int z = -sampleSize; z <= sampleSize; ++z) {
+                vec3 offset = vec3(x, y, z) * 0.1;
+                float closestDepth = texture(light.shadowMap, lightSpaceCoords + offset).r;
+                closestDepth *= light.farPlane;
+                shadow += (currentDepth - bias > closestDepth) ? 1.0 : 0.0;
+                samples++;
+            }
+        }
+    }
+    shadow /= samples;
+    return shadow;
 }
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {

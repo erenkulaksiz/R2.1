@@ -8,7 +8,7 @@
 #include <R2/Light.h>
 #include <R2/MeshGroup.h>
 
-R2::Mesh::Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, float *p_vertices, unsigned int *p_indices, size_t vertexCount, size_t indexCount, Shader *p_shader)
+R2::Mesh::Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, float* p_vertices, unsigned int* p_indices, size_t vertexCount, size_t indexCount, Shader* p_shader)
 {
   std::cout << "R2::Mesh::Mesh()" << std::endl;
   m_position = position;
@@ -21,7 +21,7 @@ R2::Mesh::Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, float *p
   m_pshader = p_shader;
 }
 
-R2::Mesh::Mesh(glm::vec3 position, float *p_vertices, unsigned int *p_indices, size_t vertexCount, size_t indexCount, Shader *p_shader)
+R2::Mesh::Mesh(glm::vec3 position, float* p_vertices, unsigned int* p_indices, size_t vertexCount, size_t indexCount, Shader* p_shader)
 {
   std::cout << "R2::Mesh::Mesh()" << std::endl;
   m_position = position;
@@ -34,7 +34,7 @@ R2::Mesh::Mesh(glm::vec3 position, float *p_vertices, unsigned int *p_indices, s
   m_pshader = p_shader;
 }
 
-R2::Mesh::Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, Shader *p_shader)
+R2::Mesh::Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, Shader* p_shader)
 {
   std::cout << "R2::Mesh::Mesh()" << std::endl;
   m_position = position;
@@ -43,7 +43,7 @@ R2::Mesh::Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, Shader *
   m_pshader = p_shader;
 }
 
-R2::Mesh::Mesh(Shader *p_shader)
+R2::Mesh::Mesh(Shader* p_shader)
 {
   std::cout << "R2::Mesh::Mesh()" << std::endl;
   m_pshader = p_shader;
@@ -73,9 +73,9 @@ void R2::Mesh::setup()
   }
   else
   {
-    m_pvao->linkAttrib(*m_pvbo, 0, 3, GL_FLOAT, 8 * sizeof(float), (void *)0);
-    m_pvao->linkAttrib(*m_pvbo, 1, 2, GL_FLOAT, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-    m_pvao->linkAttrib(*m_pvbo, 2, 3, GL_FLOAT, 8 * sizeof(float), (void *)(5 * sizeof(float)));
+    m_pvao->linkAttrib(*m_pvbo, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
+    m_pvao->linkAttrib(*m_pvbo, 1, 2, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    m_pvao->linkAttrib(*m_pvbo, 2, 3, GL_FLOAT, 8 * sizeof(float), (void*)(5 * sizeof(float)));
   }
 
   m_pvao->unbind();
@@ -83,13 +83,13 @@ void R2::Mesh::setup()
   m_pebo->unbind();
 }
 
-void R2::Mesh::setVertices(float *vertices, size_t vertexCount)
+void R2::Mesh::setVertices(float* vertices, size_t vertexCount)
 {
   this->m_pvertices = vertices;
   this->m_vertexCount = vertexCount;
 }
 
-void R2::Mesh::setIndices(unsigned int *indices, size_t indexCount)
+void R2::Mesh::setIndices(unsigned int* indices, size_t indexCount)
 {
   this->m_pindices = indices;
   this->m_indexCount = indexCount;
@@ -125,7 +125,7 @@ glm::vec3 R2::Mesh::getScale()
   return m_scale;
 }
 
-R2::Shader *R2::Mesh::getShader()
+R2::Shader* R2::Mesh::getShader()
 {
   return m_pshader;
 }
@@ -150,7 +150,7 @@ std::string R2::Mesh::getName()
   return m_name;
 }
 
-void R2::Mesh::render(Camera *p_camera, Scene *p_scene)
+void R2::Mesh::render(Camera* p_camera, Scene* p_scene)
 {
   if (m_isCamera || !m_isVisible)
   {
@@ -199,18 +199,6 @@ void R2::Mesh::render(Camera *p_camera, Scene *p_scene)
 
   if (!m_isLight && !m_isBillboard)
   {
-    if (p_scene->getDirectionalLights().size() != 0)
-    {
-      glActiveTexture(GL_TEXTURE1);
-      GLuint depthMapTexture = p_scene->getDirectionalLights()[0]->getDepthMap();
-      glBindTexture(GL_TEXTURE_2D, depthMapTexture);
-    }
-
-    /*
-    glActiveTexture(GL_TEXTURE2);
-    GLuint depthMapTexture = p_scene->getPointLights()[0]->getDepthMap();
-    glBindTexture(GL_TEXTURE_CUBE_MAP, depthMapTexture);*/
-
     m_pshader->setBool("lightsEnabled", p_scene->getIsLightsActive());
 
     setShaderLightValues(p_scene->getPointLights(), "pointLights");
@@ -223,7 +211,7 @@ void R2::Mesh::render(Camera *p_camera, Scene *p_scene)
   glDrawElements(m_isLine ? GL_LINES : GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
 }
 
-void R2::Mesh::render(Camera *p_camera, Scene *p_scene, Shader *p_shader)
+void R2::Mesh::render(Camera* p_camera, Scene* p_scene, Shader* p_shader)
 {
   if (m_isCamera || !m_isVisible)
   {
@@ -272,18 +260,6 @@ void R2::Mesh::render(Camera *p_camera, Scene *p_scene, Shader *p_shader)
 
   if (!m_isLight && !m_isBillboard)
   {
-    if (p_scene->getDirectionalLights().size() != 0)
-    {
-      glActiveTexture(GL_TEXTURE1);
-      GLuint depthMapTexture = p_scene->getDirectionalLights()[0]->getDepthMap();
-      glBindTexture(GL_TEXTURE_2D, depthMapTexture);
-    }
-
-    /*
-    glActiveTexture(GL_TEXTURE2);
-    GLuint depthMapTexture = p_scene->getPointLights()[0]->getDepthMap();
-    glBindTexture(GL_TEXTURE_CUBE_MAP, depthMapTexture);*/
-
     p_shader->setBool("lightsEnabled", p_scene->getIsLightsActive());
 
     setShaderLightValues(p_scene->getPointLights(), "pointLights", p_shader);
@@ -296,7 +272,7 @@ void R2::Mesh::render(Camera *p_camera, Scene *p_scene, Shader *p_shader)
   glDrawElements(m_isLine ? GL_LINES : GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
 }
 
-void R2::Mesh::renderShadowMap(Shader *p_shader, glm::mat4 lightSpaceMatrix)
+void R2::Mesh::renderShadowMap(Shader* p_shader, glm::mat4 lightSpaceMatrix)
 {
   if (m_isCamera || !m_isVisible || m_isLight || m_isLine || m_isBillboard)
     return;
@@ -317,7 +293,7 @@ void R2::Mesh::renderShadowMap(Shader *p_shader, glm::mat4 lightSpaceMatrix)
   glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
 }
 
-void R2::Mesh::renderShadowMap(Shader *p_shader, std::vector<glm::mat4> lightSpaceMatrix, glm::vec3 lightPos, float farPlane)
+void R2::Mesh::renderShadowMap(Shader* p_shader, std::vector<glm::mat4> lightSpaceMatrix, glm::vec3 lightPos, float farPlane)
 {
   if (m_isCamera || !m_isVisible || m_isLight || m_isLine || m_isBillboard)
     return;
@@ -344,7 +320,7 @@ void R2::Mesh::renderShadowMap(Shader *p_shader, std::vector<glm::mat4> lightSpa
   glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
 }
 
-void R2::Mesh::setShader(Shader *p_shader)
+void R2::Mesh::setShader(Shader* p_shader)
 {
   m_pshader = p_shader;
 }
@@ -374,7 +350,7 @@ glm::vec4 R2::Mesh::getColor()
   return m_color;
 }
 
-void R2::Mesh::addTexture(Texture *p_texture)
+void R2::Mesh::addTexture(Texture* p_texture)
 {
   m_ptextures.push_back(p_texture);
 }
@@ -451,7 +427,7 @@ int R2::Mesh::getFaceCount()
   return (m_vertexCount / 64 / 2);
 }
 
-std::vector<R2::Texture *> R2::Mesh::getTextures()
+std::vector<R2::Texture*> R2::Mesh::getTextures()
 {
   return m_ptextures;
 }
@@ -471,7 +447,7 @@ bool R2::Mesh::getIsDirectionalLight()
   return m_isDirectionalLight;
 }
 
-void R2::Mesh::setShaderLightValues(std::vector<Light *> p_lights, std::string lightType)
+void R2::Mesh::setShaderLightValues(std::vector<Light*> p_lights, std::string lightType)
 {
   for (int i = 0; i < p_lights.size(); i++)
   {
@@ -494,20 +470,28 @@ void R2::Mesh::setShaderLightValues(std::vector<Light *> p_lights, std::string l
 
     if (p_lights[i]->getIsDirectionalLight())
     {
+      glActiveTexture(GL_TEXTURE16);
+      GLuint depthMapTexture = p_lights[i]->getDepthMap();
+      glBindTexture(GL_TEXTURE_2D, depthMapTexture);
+
       m_pshader->setVec3(lightType + "[" + std::to_string(i) + "].direction", p_lights[i]->getDirection());
       m_pshader->setMat4(lightType + "[" + std::to_string(i) + "].lightSpaceMatrix", p_lights[i]->getLightSpaceMatrix());
-      m_pshader->setInt(lightType + "[" + std::to_string(i) + "].shadowMap", 1);
+      m_pshader->setInt(lightType + "[" + std::to_string(i) + "].shadowMap", 16);
     }
 
     if (p_lights[i]->getIsPointLight())
     {
+      glActiveTexture(GL_TEXTURE17 + i);
+      GLuint depthMapTexture = p_lights[i]->getDepthMap();
+      glBindTexture(GL_TEXTURE_CUBE_MAP, depthMapTexture);
+
       m_pshader->setFloat(lightType + "[" + std::to_string(i) + "].farPlane", p_lights[i]->getFarPlane());
-      m_pshader->setInt(lightType + "[" + std::to_string(i) + "].shadowMap", 2);
+      m_pshader->setInt(lightType + "[" + std::to_string(i) + "].shadowMap", 17 + i);
     }
   }
 }
 
-void R2::Mesh::setShaderLightValues(std::vector<Light *> p_lights, std::string lightType, Shader *p_shader)
+void R2::Mesh::setShaderLightValues(std::vector<Light*> p_lights, std::string lightType, Shader* p_shader)
 {
   for (int i = 0; i < p_lights.size(); i++)
   {
@@ -530,15 +514,23 @@ void R2::Mesh::setShaderLightValues(std::vector<Light *> p_lights, std::string l
 
     if (p_lights[i]->getIsDirectionalLight())
     {
+      glActiveTexture(GL_TEXTURE16);
+      GLuint depthMapTexture = p_lights[i]->getDepthMap();
+      glBindTexture(GL_TEXTURE_2D, depthMapTexture);
+
       p_shader->setVec3(lightType + "[" + std::to_string(i) + "].direction", p_lights[i]->getDirection());
       p_shader->setMat4(lightType + "[" + std::to_string(i) + "].lightSpaceMatrix", p_lights[i]->getLightSpaceMatrix());
-      p_shader->setInt(lightType + "[" + std::to_string(i) + "].shadowMap", 1);
+      p_shader->setInt(lightType + "[" + std::to_string(i) + "].shadowMap", 16);
     }
 
     if (p_lights[i]->getIsPointLight())
     {
+      glActiveTexture(GL_TEXTURE17 + i);
+      GLuint depthMapTexture = p_lights[i]->getDepthMap();
+      glBindTexture(GL_TEXTURE_CUBE_MAP, depthMapTexture);
+
       p_shader->setFloat(lightType + "[" + std::to_string(i) + "].farPlane", p_lights[i]->getFarPlane());
-      p_shader->setInt(lightType + "[" + std::to_string(i) + "].shadowMap", 2);
+      p_shader->setInt(lightType + "[" + std::to_string(i) + "].shadowMap", 17 + i);
     }
   }
 }
@@ -593,7 +585,7 @@ bool R2::Mesh::getIsDrawingBoundingBox()
   return m_isDrawingBoundingBox;
 }
 
-void R2::Mesh::drawBoundingBox(Camera *p_camera)
+void R2::Mesh::drawBoundingBox(Camera* p_camera)
 {
   // getBoundingBoxMin();
   // glm::vec3 max = getBoundingBoxMax();

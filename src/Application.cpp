@@ -77,7 +77,7 @@ bool R2::Application::setup()
   m_pdirectionalDepthShader = new Shader(m_putils->getFilePath("/shaders/shadow/shadow.vert"), m_putils->getFilePath("/shaders/shadow/shadow.frag"));
   m_pdirectionalDepthShader->setup(this);
 
-  m_ppointDepthShader = new Shader(m_putils->getFilePath("/shaders/pointShadow/pointShadow.vert"), m_putils->getFilePath("/shaders/shadow/pointShadow.frag"), m_putils->getFilePath("/shaders/shadow/pointShadow.geom"));
+  m_ppointDepthShader = new Shader(m_putils->getFilePath("/shaders/pointShadow/pointShadow.vert"), m_putils->getFilePath("/shaders/pointShadow/pointShadow.frag"), m_putils->getFilePath("/shaders/pointShadow/pointShadow.geom"));
   m_ppointDepthShader->setup(this);
 
   glfwSetWindowSizeCallback(m_pwindow, [](GLFWwindow *window, int width, int height)
