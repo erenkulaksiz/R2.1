@@ -15,6 +15,7 @@ include_directories(
 )
 
 add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
+add_definitions(-D__R2_DEBUG)
 
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/imgui)
 file(GLOB IMGUI_SOURCES 

@@ -17,10 +17,8 @@ namespace R2
     rapidxml::xml_document<> &getDoc();
     rapidxml::xml_node<> *getRootNode();
     rapidxml::xml_node<> *getSceneNode(std::string sceneName);
+    std::vector<rapidxml::xml_node<>*> getSceneNodes();
     std::vector<rapidxml::xml_node<> *> getObjectNodes(std::string sceneName);
-    rapidxml::xml_node<> *getObjectNode(std::string sceneName, std::string objectName);
-    std::string getObjectName(std::string sceneName, std::string objectName);
-    std::string getObjectFile(std::string sceneName, std::string objectName);
     std::string getConfigValue(std::string key);
 
   private:

@@ -15,7 +15,9 @@ namespace R2
   {
   public:
     Light(Application *p_application);
+    ~Light();
     void setup() override;
+    void cleanup() override;
     float getIntensity() const;
     void setIntensity(float intensity);
     glm::vec3 getAmbient() const;
@@ -35,7 +37,6 @@ namespace R2
     void updateShadowMap(Shader *p_shader, Camera *p_camera);
     glm::mat4 getLightSpaceMatrix() const;
     GLuint getDepthMap() const;
-    void cleanup() override;
     void setNearPlane(float nearPlane);
     float getNearPlane() const;
     void setFarPlane(float farPlane);

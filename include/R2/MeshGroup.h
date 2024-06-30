@@ -20,6 +20,8 @@ namespace R2
     void renderShadowMap(Shader *p_shader, std::vector<glm::mat4> lightSpaceMatrix, glm::vec3 lightPos, float farPlane) override;
     std::vector<Mesh *> getChildMeshes();
     void setIsVisible(bool isVisible) override;
+    void drawBoundingBox(Scene *p_scene) override;
+    void setIsDrawingBoundingBox(bool isDrawingBoundingBox) override;
 
   private:
     std::vector<Mesh *> m_meshes;

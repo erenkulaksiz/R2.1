@@ -1,81 +1,131 @@
 #define GLFW_INCLUDE_NONE
 #include <iostream>
 #include <R2/SceneManager.h>
+#include <R2/Scene.h>
 
 R2::SceneManager::SceneManager(Application *p_application)
 {
   std::cout << "SceneManager::SceneManager()" << std::endl;
-  this->p_mapplication = p_application;
+  this->m_papplication = p_application;
 }
 
 void R2::SceneManager::addScene(Scene *p_scene)
 {
   std::cout << "SceneManager::addScene()" << std::endl;
-  p_mscenes.push_back(p_scene);
+  m_pscenes.push_back(p_scene);
 }
 
-void R2::SceneManager::setCurrentScene(unsigned int index)
+void R2::SceneManager::setCurrentScene(Scene *p_scene)
 {
   std::cout << "SceneManager::setCurrentScene()" << std::endl;
-  if (p_mcurrentScene == index)
+
+  if (m_pscenes.size() == 0)
   {
-    std::cout << "SceneManager::setCurrentScene() p_mcurrentScene == index" << std::endl;
+    std::cout << "No scenes added to SceneManager" << std::endl;
     return;
   }
 
-  if (index < p_mscenes.size())
+  if (m_pcurrentScene->getName() == p_scene->getName())
   {
-    std::cout << "SceneManager::setCurrentScene() index < p_mscenes.size()" << std::endl;
-    p_mcurrentScene = index;
+    std::cout << "SceneManager::setCurrentScene() m_pcurrentScene == p_scene->getName()" << std::endl;
+    return;
+  }
 
-    if (p_mscenes.size() == 0)
+  m_pcurrentScene = p_scene;
+
+  for (int i = 0; i < m_pscenes.size(); i++)
+  {
+    m_pscenes[i]->setIsActiveScene(false);
+  }
+
+  m_pcurrentScene->setIsActiveScene(true);
+
+  if (!m_pcurrentScene->getIsSetup() && !m_pcurrentScene->getIsStartedSetup())
+  {
+    m_pcurrentScene->setup();
+  }
+}
+
+void R2::SceneManager::setCurrentScene(int index)
+{
+  std::cout << "SceneManager::setCurrentScene()" << std::endl;
+
+  if (m_pscenes.size() == 0)
+  {
+    std::cout << "No scenes added to SceneManager" << std::endl;
+    return;
+  }
+
+  if (index < 0 || index >= m_pscenes.size())
+  {
+    std::cout << "SceneManager::setCurrentScene() index out of range" << std::endl;
+    return;
+  }
+
+  if (m_pcurrentScene != nullptr)
+  {
+    if (m_pcurrentScene->getName() == m_pscenes[index]->getName())
     {
-      std::cout << "No scenes added to SceneManager" << std::endl;
+      std::cout << "Set scene is already the scene" << std::endl;
       return;
-    }
-
-    if (p_mscenes[index]->getIsActiveScene())
-    {
-      return;
-    }
-
-    for (int i = 0; i < p_mscenes.size(); i++)
-    {
-      if (i != index)
-      {
-        // p_mscenes[i]->cleanup(); #TODO: Cleaned up scenes are not being re-setup
-        p_mscenes[i]->setIsActiveScene(false);
-      }
-    }
-
-    p_mscenes[index]->setIsActiveScene(true);
-
-    if (!p_mscenes[index]->getIsSetup() && !p_mscenes[index]->getIsStartedSetup())
-    {
-      p_mscenes[index]->setup();
     }
   }
-  else
+
+  m_pcurrentScene = m_pscenes[index];
+
+  for (int i = 0; i < m_pscenes.size(); i++)
   {
-    std::cout << "SceneManager::setCurrentScene() index >= p_mscenes.size()" << std::endl;
+    m_pscenes[i]->setIsActiveScene(false);
+    m_pscenes[i]->setIsPlaying(false);
+  }
+
+  m_pcurrentScene->setIsActiveScene(true);
+
+  if (!m_pcurrentScene->getIsSetup() && !m_pcurrentScene->getIsStartedSetup())
+  {
+    m_pcurrentScene->setup();
   }
 }
 
 R2::Scene *R2::SceneManager::getCurrentScene()
 {
-  return p_mscenes[p_mcurrentScene];
+  return m_pcurrentScene;
 }
 
 std::vector<R2::Scene *> R2::SceneManager::getScenes()
 {
-  return p_mscenes;
+  return m_pscenes;
 }
 
 void R2::SceneManager::cleanup()
 {
   std::cout << "SceneManager::cleanup()" << std::endl;
-  for (int i = 0; i < p_mscenes.size(); i++)
+  for (int i = 0; i < m_pscenes.size(); i++)
   {
-    p_mscenes[i]->cleanup();
+    m_pscenes[i]->cleanup();
   }
+}
+
+void R2::SceneManager::loadScenes()
+{
+  std::cout << "SceneManager::loadScenes()" << std::endl;
+  std::vector<rapidxml::xml_node<>*> sceneNodes = m_papplication->getConfig()->getSceneNodes();
+
+  for (int i = 0; i < sceneNodes.size(); i++)
+  {
+    std::string sceneName = sceneNodes[i]->first_attribute("name")->value();
+    
+    Scene *p_scene = new Scene(m_papplication);
+    p_scene->setName(sceneName);
+
+    if (sceneNodes[i]->first_attribute("isDefault") != nullptr)
+    {
+      p_scene->setIsActiveScene(true);
+    }
+
+    addScene(p_scene);
+  }
+
+  std::cout << "SceneManager::loadScenes() " << m_pscenes.size() << " scenes loaded" << std::endl;
+  setCurrentScene(0);
 }

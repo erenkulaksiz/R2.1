@@ -45,6 +45,7 @@ namespace R2
     unsigned int getScreenHeight();
     Shader *getDirectionalDepthShader();
     Shader *getPointDepthShader();
+    Shader *getBoundingBoxShader();
 
   private:
     GLFWwindow *m_pwindow;
@@ -69,6 +70,7 @@ namespace R2
     float m_previousFrame;
     Shader *m_pdirectionalDepthShader;
     Shader *m_ppointDepthShader;
+    Shader* m_pboundingBoxShader;
   };
 }
 

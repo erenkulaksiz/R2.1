@@ -35,7 +35,7 @@ void R2::Camera::updateMatrix()
   updateProjectionMatrix();
 }
 
-void R2::Camera::setActive(bool isActive)
+void R2::Camera::setIsActive(bool isActive)
 {
   m_isActive = isActive;
   updateMatrix();

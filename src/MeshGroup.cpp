@@ -107,3 +107,20 @@ void R2::MeshGroup::setIsVisible(bool isVisible)
     m_meshes[i]->setIsVisible(isVisible);
   }
 }
+
+void R2::MeshGroup::drawBoundingBox(Scene *p_scene)
+{
+  for (size_t i = 0; i < m_meshes.size(); i++)
+  {
+    m_meshes[i]->drawBoundingBox(p_scene);
+  }
+}
+
+void R2::MeshGroup::setIsDrawingBoundingBox(bool isDrawingBoundingBox)
+{
+  m_isDrawingBoundingBox = isDrawingBoundingBox;
+  for (size_t i = 0; i < m_meshes.size(); i++)
+  {
+    m_meshes[i]->setIsDrawingBoundingBox(isDrawingBoundingBox);
+  }
+}

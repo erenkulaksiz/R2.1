@@ -15,16 +15,17 @@ namespace R2
   public:
     SceneManager(Application *p_application);
     void addScene(Scene *p_scene);
-    void setCurrentScene(unsigned int index);
-    void setupCurrentScene();
+    void setCurrentScene(Scene *p_scene);
+    void setCurrentScene(int index);
+    void loadScenes();
     Scene *getCurrentScene();
     std::vector<Scene *> getScenes();
     void cleanup();
 
   private:
-    Application *p_mapplication;
-    std::vector<Scene *> p_mscenes;
-    unsigned int p_mcurrentScene = -1;
+    Application *m_papplication;
+    std::vector<Scene *> m_pscenes;
+    Scene* m_pcurrentScene = nullptr;
   };
 }
 

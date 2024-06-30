@@ -194,7 +194,10 @@ void R2::Imgui::renderMeshGeneral(Mesh *p_mesh)
       if (!p_mesh->getIsGroup())
       {
         ImGui::Text("face count: %d", p_mesh->getFaceCount());
+      }
 
+      if (!p_mesh->getIsLight())
+      {
         bool isDrawingBoundingBox = p_mesh->getIsDrawingBoundingBox();
         if (ImGui::Checkbox("bounding box", &isDrawingBoundingBox))
         {
@@ -245,11 +248,11 @@ void R2::Imgui::renderCameraSettings(Camera *p_camera)
           if (meshes[i]->getIsCamera())
           {
             Camera *camera = static_cast<Camera *>(meshes[i]);
-            camera->setActive(false);
+            camera->setIsActive(false);
           }
         }
 
-        p_camera->setActive(true);
+        p_camera->setIsActive(true);
         m_papplication->getSceneManager()->getCurrentScene()->setCamera(p_camera);
       }
     }
@@ -467,6 +470,13 @@ void R2::Imgui::renderScene(Scene *p_scene)
 {
   if (ImGui::CollapsingHeader("scene"))
   {
+    bool isPlaying = p_scene->getIsPlaying();
+    std::string playText = isPlaying ? "pause" : "play";
+    if (ImGui::Button(playText.c_str()))
+    {
+      p_scene->setIsPlaying(!isPlaying);
+    }
+
     if (ImGui::Button("reload scene"))
     {
       m_selectedMesh = nullptr;
@@ -519,7 +529,19 @@ void R2::Imgui::renderMeshTextures(Mesh *p_mesh)
     {
       if (texture->getIsDiffuse())
       {
-        ImGui::Text("diffuse");
+        ImGui::SeparatorText("diffuse");
+      }
+      else if (texture->getIsSpecular())
+      {
+        ImGui::SeparatorText("specular");
+      }
+      else if (texture->getIsNormal())
+      {
+        ImGui::SeparatorText("normal");
+      }
+      else
+      {
+        ImGui::SeparatorText("unknown");
       }
       ImGui::Image((void *)(intptr_t)texture->getId(), ImVec2(64, 64));
       ImGui::SameLine();

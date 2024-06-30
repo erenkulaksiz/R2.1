@@ -9,6 +9,7 @@ namespace R2
   {
   public:
     VAO();
+    ~VAO();
     GLuint m_ID;
     void cleanup();
     void linkAttrib(VBO &VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void *p_offset);

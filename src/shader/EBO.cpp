@@ -10,6 +10,12 @@ R2::EBO::EBO(GLuint *p_indices, GLsizeiptr size)
   std::cout << "EBO created with ID: " << m_ID << std::endl;
 }
 
+R2::EBO::~EBO()
+{
+  std::cout << "EBO::~EBO()" << m_ID << std::endl;
+  cleanup();
+}
+
 void R2::EBO::bind()
 {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);

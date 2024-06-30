@@ -13,6 +13,7 @@ R2::Config::Config(Application *p_application)
     if (this->appXML.empty())
     {
       std::cerr << "Error: app.xml is empty or no app.xml" << std::endl;
+      throw std::runtime_error("app.xml is empty or no app.xml");
     }
 
     this->doc.parse<0>(&appXML[0]);
@@ -32,6 +33,19 @@ rapidxml::xml_document<> &R2::Config::getDoc()
 rapidxml::xml_node<> *R2::Config::getRootNode()
 {
   return this->p_rootNode;
+}
+
+std::vector<rapidxml::xml_node<>*> R2::Config::getSceneNodes()
+{
+  std::vector<rapidxml::xml_node<>*> sceneNodes;
+  rapidxml::xml_node<> *rootNode = this->p_rootNode->first_node("scenes");
+
+  for (rapidxml::xml_node<> *sceneNode = rootNode->first_node("scene"); sceneNode; sceneNode = sceneNode->next_sibling())
+  {
+    sceneNodes.push_back(sceneNode);
+  }
+
+  return sceneNodes;
 }
 
 rapidxml::xml_node<> *R2::Config::getSceneNode(std::string sceneName)
@@ -54,33 +68,12 @@ std::vector<rapidxml::xml_node<> *> R2::Config::getObjectNodes(std::string scene
   std::vector<rapidxml::xml_node<> *> objectNodes;
   rapidxml::xml_node<> *sceneNode = getSceneNode(sceneName);
 
-  if (sceneNode)
+  for (rapidxml::xml_node<> *childNode = sceneNode->first_node(); childNode; childNode = childNode->next_sibling())
   {
-    for (rapidxml::xml_node<> *objectNode = sceneNode->first_node("object"); objectNode; objectNode = objectNode->next_sibling())
-    {
-      objectNodes.push_back(objectNode);
-    }
+    objectNodes.push_back(childNode);
   }
 
   return objectNodes;
-}
-
-rapidxml::xml_node<> *R2::Config::getObjectNode(std::string sceneName, std::string objectName)
-{
-  rapidxml::xml_node<> *sceneNode = getSceneNode(sceneName);
-
-  if (sceneNode)
-  {
-    for (rapidxml::xml_node<> *objectNode = sceneNode->first_node("object"); objectNode; objectNode = objectNode->next_sibling())
-    {
-      if (std::string(objectNode->first_attribute("name")->value()) == objectName)
-      {
-        return objectNode;
-      }
-    }
-  }
-
-  return nullptr;
 }
 
 std::string R2::Config::getConfigValue(std::string key)

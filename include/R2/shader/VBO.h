@@ -13,6 +13,7 @@ namespace R2
   {
   public:
     VBO(GLfloat *p_vertices, GLsizeiptr size);
+    ~VBO();
     void cleanup();
     GLuint m_ID;
     void bind();

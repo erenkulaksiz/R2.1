@@ -52,6 +52,12 @@ R2::Shader::Shader(std::string vertexPath, std::string fragmentPath, std::string
   this->m_geometryPath = geometryPath;
 }
 
+R2::Shader::~Shader()
+{
+  std::cout << "Shader::~Shader()" << std::endl;
+  cleanup();
+}
+
 void R2::Shader::setup(Application *p_application)
 {
   std::cout << "Shader::setup()" << m_vertexPath << std::endl;

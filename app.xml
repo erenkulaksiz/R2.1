@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <application>
 	<scenes>
-		<scene name="TestScene">
-			<object name="TestCube" file="/resources/testcube.obj" posX="0" posY="0" posZ="0" type="mesh" />
-      <object name="TestCube2" file="/resources/testcube.obj" posX="2" posY="2" posZ="2" type="mesh" />
+		<scene name="TestScene" isDefault="true">
+			<mesh name="CubePlane" file="/resources/testcube.obj" pos="0,0,0" scl="10,0.5,10" />
+      <mesh name="TestCube" file="/resources/testcube.obj" pos="0,2,0" rot="60,60,60" />
+      <mesh name="Cybertruck" file="/resources/Cybertruck.obj" pos="0,5,0" />
+      <light name="RedPointLight" pos="0,2,5" type="point" color="1,0,0,1" intensity="1" />
+      <light name="BluePointLight" pos="3,1,4" type="point" color="0,1,0,1" intensity="2" />
+      <camera name="MainCamera" pos="0,0,0" isMain="true" />
+      <camera name="SecondCamera" pos="5.2,5,5" />
 		</scene>
+    <scene name="TestScene2">
+      <mesh name="TestCube" file="/resources/testcube.obj" pos="0,0,0" />
+      <light name="PointLight" pos="5,5,5" type="point" color="1,1,1,1" intensity="1" />
+      <camera name="MainCamera" pos="0,0,0" isMain="true" />
+    </scene>
+    <scene name="BillboardTest">
+      <billboard name="Billboard" texture="/resources/test_spec.jpg" pos="0,0,0" />
+      <camera name="MainCamera" pos="0,0,0" isMain="true" />
+    </scene>
+    <scene name="DirectionalLightTest">
+      <mesh name="CubePlane" file="/resources/testcube.obj" pos="0,0,0" scl="10,0.5,10" />
+      <mesh name="TestCube" file="/resources/testcube.obj" pos="0,2,0" rot="60,60,60" />
+      <light name="DirectionalLight" pos="0,20,5" type="directional" color="1,1,1,1" intensity="1" dir="-1,-1,0" />
+      <camera name="MainCamera" pos="0,0,0" isMain="true" />
+    </scene>
 	</scenes>
 	<config>
 		<item name="width" value="920" />

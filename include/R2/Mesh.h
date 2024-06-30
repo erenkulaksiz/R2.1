@@ -73,8 +73,10 @@ namespace R2
     bool getIsDirectionalLight();
     glm::vec3 getBoundingBoxMin();
     glm::vec3 getBoundingBoxMax();
-    void setIsDrawingBoundingBox(bool isDrawingBoundingBox);
+    virtual void setIsDrawingBoundingBox(bool isDrawingBoundingBox);
     bool getIsDrawingBoundingBox();
+    void setBoundingBox(glm::vec3 min, glm::vec3 max);
+    virtual void drawBoundingBox(Scene* p_scene);
 
   protected:
     Shader *m_pshader;
@@ -86,6 +88,7 @@ namespace R2
     VAO *m_pvao;
     VBO *m_pvbo;
     EBO *m_pebo;
+    bool m_setupBoundingBox = false;
     float *m_pvertices;
     unsigned int *m_pindices;
     size_t m_vertexCount;
@@ -106,7 +109,6 @@ namespace R2
     glm::vec3 m_boundingBoxMin = glm::vec3(0.0f);
     glm::vec3 m_boundingBoxMax = glm::vec3(0.0f);
     bool m_boundingBoxInitialized = false;
-    void drawBoundingBox(Camera *p_camera);
   };
 }
 

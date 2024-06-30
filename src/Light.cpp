@@ -9,6 +9,12 @@ R2::Light::Light(Application *p_application) : Billboard(p_application, p_applic
   m_papplication = p_application;
 }
 
+R2::Light::~Light()
+{
+  std::cout << "R2::Light::~Light()" << std::endl;
+  cleanup();
+}
+
 void R2::Light::setup()
 {
   std::cout << "R2::Light::setup()" << std::endl;
@@ -170,7 +176,7 @@ void R2::Light::updateShadowMap(Shader *p_shader, Camera *p_camera)
     glClear(GL_DEPTH_BUFFER_BIT);
 
     m_papplication->getRenderer()->renderShadowMap(p_shader, m_papplication->getSceneManager()->getCurrentScene(), m_lightSpaceMatrix);
-
+    
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
   }
   else if (m_isPointLight)
@@ -218,6 +224,7 @@ void R2::Light::cleanup()
 
   m_pvao->cleanup();
   m_pvbo->cleanup();
+  m_pebo->cleanup();
 }
 
 void R2::Light::setNearPlane(float nearPlane)

@@ -5,8 +5,6 @@
 #include <R2/SceneManager.h>
 #include <R2/Renderer.h>
 #include <R2/Camera.h>
-#include <R2/scenes/TestScene.h>
-#include <R2/scenes/TestScene2.h>
 
 R2::Application::Application()
 {
@@ -14,7 +12,7 @@ R2::Application::Application()
 }
 
 bool R2::Application::setup()
-{
+{ 
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -68,17 +66,16 @@ bool R2::Application::setup()
   m_pinput = new Input(this);
   m_pconfig = new Config(this);
   m_psceneManager = new SceneManager(this);
-  TestScene *p_testScene = new TestScene(this);
-  m_psceneManager->addScene(p_testScene);
-  m_psceneManager->setCurrentScene(0);
-  TestScene2 *p_testScene2 = new TestScene2(this);
-  m_psceneManager->addScene(p_testScene2);
+  m_psceneManager->loadScenes();
 
   m_pdirectionalDepthShader = new Shader(m_putils->getFilePath("/shaders/shadow/shadow.vert"), m_putils->getFilePath("/shaders/shadow/shadow.frag"));
   m_pdirectionalDepthShader->setup(this);
 
   m_ppointDepthShader = new Shader(m_putils->getFilePath("/shaders/pointShadow/pointShadow.vert"), m_putils->getFilePath("/shaders/pointShadow/pointShadow.frag"), m_putils->getFilePath("/shaders/pointShadow/pointShadow.geom"));
   m_ppointDepthShader->setup(this);
+
+  m_pboundingBoxShader = new Shader(m_putils->getFilePath("/shaders/line/line.vert"), m_putils->getFilePath("/shaders/line/line.frag"));
+  m_pboundingBoxShader->setup(this);
 
   glfwSetWindowSizeCallback(m_pwindow, [](GLFWwindow *window, int width, int height)
                             {
@@ -266,4 +263,9 @@ R2::Shader *R2::Application::getDirectionalDepthShader()
 R2::Shader *R2::Application::getPointDepthShader()
 {
   return m_ppointDepthShader;
+}
+
+R2::Shader *R2::Application::getBoundingBoxShader()
+{
+  return m_pboundingBoxShader;
 }

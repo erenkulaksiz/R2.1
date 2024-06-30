@@ -63,7 +63,7 @@ void R2::Mesh::setup()
 
   m_pvao = new VAO();
   m_pvao->bind();
-
+  
   m_pvbo = new VBO(m_pvertices, m_vertexCount);
   m_pebo = new EBO(m_pindices, m_indexCount);
 
@@ -157,14 +157,15 @@ void R2::Mesh::render(Camera* p_camera, Scene* p_scene)
     return;
   }
 
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  glDepthFunc(GL_LESS);
-  glViewport(0, 0, p_scene->getApplication()->getScreenWidth(), p_scene->getApplication()->getScreenHeight());
-
   if (m_isDrawingBoundingBox)
   {
-    drawBoundingBox(p_camera);
+    drawBoundingBox(p_scene);
   }
+
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  glDepthFunc(GL_LESS);
+  glEnable(GL_DEPTH_TEST);
+  glViewport(0, 0, p_scene->getApplication()->getScreenWidth(), p_scene->getApplication()->getScreenHeight());
 
   m_pvao->bind();
   m_pshader->activate();
@@ -218,14 +219,15 @@ void R2::Mesh::render(Camera* p_camera, Scene* p_scene, Shader* p_shader)
     return;
   }
 
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  glDepthFunc(GL_LESS);
-  glViewport(0, 0, p_scene->getApplication()->getScreenWidth(), p_scene->getApplication()->getScreenHeight());
-
   if (m_isDrawingBoundingBox)
   {
-    drawBoundingBox(p_camera);
+    drawBoundingBox(p_scene);
   }
+
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  glDepthFunc(GL_LESS);
+  glEnable(GL_DEPTH_TEST);
+  glViewport(0, 0, p_scene->getApplication()->getScreenWidth(), p_scene->getApplication()->getScreenHeight());
 
   m_pvao->bind();
   p_shader->activate();
@@ -486,7 +488,7 @@ void R2::Mesh::setShaderLightValues(std::vector<Light*> p_lights, std::string li
       glBindTexture(GL_TEXTURE_CUBE_MAP, depthMapTexture);
 
       m_pshader->setFloat(lightType + "[" + std::to_string(i) + "].farPlane", p_lights[i]->getFarPlane());
-      m_pshader->setInt(lightType + "[" + std::to_string(i) + "].shadowMap", 17 + i);
+      m_pshader->setInt(lightType + "[" + std::to_string(i) + "].shadowMap", i + 17);
     }
   }
 }
@@ -530,44 +532,14 @@ void R2::Mesh::setShaderLightValues(std::vector<Light*> p_lights, std::string li
       glBindTexture(GL_TEXTURE_CUBE_MAP, depthMapTexture);
 
       p_shader->setFloat(lightType + "[" + std::to_string(i) + "].farPlane", p_lights[i]->getFarPlane());
-      p_shader->setInt(lightType + "[" + std::to_string(i) + "].shadowMap", 17 + i);
+      p_shader->setInt(lightType + "[" + std::to_string(i) + "].shadowMap", i + 17);
     }
   }
 }
 
 glm::vec3 R2::Mesh::getBoundingBoxMin()
 {
-
-  // std::cout << "R2::Mesh::getBoundingBoxMin() x: " << x << std::endl;
-
-  /*
-  if (!m_boundingBoxInitialized)
-  {
-    float minX = std::numeric_limits<float>::max();
-    float minY = std::numeric_limits<float>::max();
-    float minZ = std::numeric_limits<float>::max();
-
-    for (size_t i = 0; i < m_vertexCount; ++i)
-    {
-      float x = m_pvertices[i * 8];
-      float y = m_pvertices[i * 8 + 1];
-      float z = m_pvertices[i * 8 + 2];
-
-      if (x < minX)
-        minX = x;
-      if (y < minY)
-        minY = y;
-      if (z < minZ)
-        minZ = z;
-    }
-
-    m_boundingBoxMin = glm::vec3(minX, minY, minZ);
-  }
-
   return m_boundingBoxMin;
-  */
-
-  return glm::vec3(0.0f, 0.0f, 0.0f);
 }
 
 glm::vec3 R2::Mesh::getBoundingBoxMax()
@@ -585,11 +557,80 @@ bool R2::Mesh::getIsDrawingBoundingBox()
   return m_isDrawingBoundingBox;
 }
 
-void R2::Mesh::drawBoundingBox(Camera* p_camera)
+void R2::Mesh::drawBoundingBox(Scene *p_scene)
 {
-  // getBoundingBoxMin();
-  // glm::vec3 max = getBoundingBoxMax();
+  glm::mat4 model = glm::mat4(1.0f);
+  model = glm::translate(model, m_position);
+  model = glm::rotate(model, glm::radians(m_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+  model = glm::rotate(model, glm::radians(m_rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+  model = glm::rotate(model, glm::radians(m_rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+  model = glm::scale(model, m_scale);
 
-  // std::cout << "R2::Mesh::drawBoundingBox() min: " << min.x << ", " << min.y << ", " << min.z << std::endl;
-  //  std::cout << "R2::Mesh::drawBoundingBox() max: " << max.x << ", " << max.y << ", " << max.z << std::endl;
+  glm::vec3 min = m_boundingBoxMin;
+  glm::vec3 max = m_boundingBoxMax;
+
+  glm::vec3 vertices[] = {
+    glm::vec3(min.x, min.y, min.z),
+    glm::vec3(max.x, min.y, min.z),
+    glm::vec3(max.x, max.y, min.z),
+    glm::vec3(min.x, max.y, min.z),
+    glm::vec3(min.x, min.y, max.z),
+    glm::vec3(max.x, min.y, max.z),
+    glm::vec3(max.x, max.y, max.z),
+    glm::vec3(min.x, max.y, max.z)
+  };
+
+  unsigned int indices[] = {
+    0, 1,
+    1, 2,
+    2, 3,
+    3, 0,
+    4, 5,
+    5, 6,
+    6, 7,
+    7, 4,
+    0, 4,
+    1, 5,
+    2, 6,
+    3, 7
+  };
+
+  GLuint VAO, VBO, EBO;
+  glGenVertexArrays(1, &VAO);
+  glGenBuffers(1, &VBO);
+  glGenBuffers(1, &EBO);
+
+  glBindVertexArray(VAO);
+
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(0);
+
+  Shader* p_shader = p_scene->getApplication()->getBoundingBoxShader();
+  p_shader->activate();
+  p_shader->setMat4("model", model);
+  p_shader->setMat4("view", p_scene->getCamera()->getViewMatrix());
+  p_shader->setMat4("projection", p_scene->getCamera()->getProjectionMatrix());
+
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  glDisable(GL_DEPTH_TEST);
+  glDrawElements(GL_LINES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+  glBindVertexArray(0);
+
+  glDeleteVertexArrays(1, &VAO);
+  glDeleteBuffers(1, &VBO);
+  glDeleteBuffers(1, &EBO);
+}
+
+void R2::Mesh::setBoundingBox(glm::vec3 min, glm::vec3 max)
+{
+  m_boundingBoxMin = min;
+  m_boundingBoxMax = max;
 }

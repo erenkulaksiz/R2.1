@@ -92,8 +92,16 @@ R2::Camera *R2::Scene::getCamera()
 
 void R2::Scene::loop()
 {
-  if (!m_isActiveScene)
+  if (!m_isActiveScene) {
+    std::cout << "Scene::loop() Scene is not active" << std::endl;
     return;
+  }
+
+  if (m_pcamera == nullptr)
+  {
+    std::cout << "Scene::loop() No camera set" << std::endl;
+    return;
+  }
 
   if (m_isSetup)
   {
@@ -150,6 +158,7 @@ void R2::Scene::cleanup()
   {
     mesh->cleanup();
   }
+  m_meshes = std::vector<Mesh *>();
   m_isSetup = false;
   m_isStartedSetup = false;
 }
@@ -174,7 +183,7 @@ void R2::Scene::addGridMesh()
 
   float gridSize = 300.0f;
   int divisions = 100;
-
+  
   float halfSize = gridSize / 2.0f;
   float step = gridSize / static_cast<float>(divisions);
 
@@ -237,48 +246,50 @@ R2::Mesh *R2::Scene::getMesh(int index)
   return m_meshes[index];
 }
 
-void R2::Scene::loadMeshes()
+void R2::Scene::setup()
 {
-  std::cout << "Scene::loadMeshes()" << std::endl;
+  std::cout << "Scene::setup()" << std::endl;
+
+  m_isSetup = false;
+  m_isStartedSetup = true;
+
+#ifdef __R2_DEBUG
+  addLineMeshes();
+  addGridMesh();
+#endif
+
   std::vector<rapidxml::xml_node<> *> objectNodes = m_papplication->getConfig()->getObjectNodes(m_name);
+
+  std::cout << "Object nodes size: " << objectNodes.size() << std::endl;
 
   for (rapidxml::xml_node<> *objectNode : objectNodes)
   {
     std::cout << "Object name: " << objectNode->first_attribute("name")->value() << std::endl;
 
-    if (objectNode->first_attribute("type")->value() == std::string("mesh"))
+    if(objectNode->name() == std::string("camera"))
     {
-      std::string path = objectNode->first_attribute("file")->value();
-      Model *p_model = new Model(m_papplication);
-      Shader *p_objectShader = new Shader(m_papplication->getUtils()->getFilePath("/shaders/default/default.vert"), m_papplication->getUtils()->getFilePath("/shaders/default/default.frag"));
-      p_objectShader->setup(m_papplication);
-      std::vector<R2::Mesh *> modelMeshes = p_model->loadFromFile(m_papplication->getUtils()->getFilePath(path), p_objectShader);
-
-      if (modelMeshes.size() == 1)
-      {
-        modelMeshes[0]->setName(objectNode->first_attribute("name")->value());
-        float posX = std::atoi(objectNode->first_attribute("posX")->value());
-        float posY = std::atoi(objectNode->first_attribute("posY")->value());
-        float posZ = std::atoi(objectNode->first_attribute("posZ")->value());
-        modelMeshes[0]->setPosition(glm::vec3(posX, posY, posZ));
-        addMesh(modelMeshes[0]);
-      }
-      else
-      {
-        MeshGroup *p_meshGroup = new MeshGroup();
-        p_meshGroup->setName(objectNode->first_attribute("name")->value());
-        for (Mesh *mesh : modelMeshes)
-        {
-          p_meshGroup->addMesh(mesh);
-        }
-        float posX = std::atoi(objectNode->first_attribute("posX")->value());
-        float posY = std::atoi(objectNode->first_attribute("posY")->value());
-        float posZ = std::atoi(objectNode->first_attribute("posZ")->value());
-        p_meshGroup->setPosition(glm::vec3(posX, posY, posZ));
-        addMesh(p_meshGroup);
-      }
+      setupCameraObject(objectNode);
+    } 
+    else if (objectNode->name() == std::string("mesh"))
+    {
+      setupMeshObject(objectNode);
+    }
+    else if (objectNode->name() == std::string("light"))
+    {
+      setupLightObject(objectNode);
+    } 
+    else if(objectNode->name() == std::string("billboard"))
+    {
+      setupBillboardObject(objectNode);
+    }
+    else
+    {
+      std::cout << "Object type not recognized" << std::endl;
     }
   }
+
+  m_isSetup = true;
+  m_isStartedSetup = false;
 }
 
 void R2::Scene::reload()
@@ -321,4 +332,188 @@ bool R2::Scene::getIsLightsActive()
 R2::Application *R2::Scene::getApplication()
 {
   return m_papplication;
+}
+
+void R2::Scene::setIsPlaying(bool isPlaying)
+{
+  m_isPlaying = isPlaying;
+}
+
+bool R2::Scene::getIsPlaying()
+{
+  return m_isPlaying;
+}
+
+void R2::Scene::setupCameraObject(rapidxml::xml_node<> *objectNode)
+{
+  glm::vec3 pos = m_papplication->getUtils()->stringToVec3(objectNode->first_attribute("pos")->value());
+  glm::vec3 rot = glm::vec3(0.0f, 0.0f, 0.0f);
+
+  if (objectNode->first_attribute("rot") != nullptr)
+  {
+    rot = m_papplication->getUtils()->stringToVec3(objectNode->first_attribute("rot")->value());
+  }
+
+  glm::vec3 scl = glm::vec3(1.0f, 1.0f, 1.0f);
+
+  if (objectNode->first_attribute("scl") != nullptr)
+  {
+    scl = m_papplication->getUtils()->stringToVec3(objectNode->first_attribute("scl")->value());
+  }
+
+  if (objectNode->first_attribute("pos") != nullptr)
+  {
+    pos = m_papplication->getUtils()->stringToVec3(objectNode->first_attribute("pos")->value());
+  }
+
+  Camera* p_camera = new Camera(m_papplication);
+  p_camera->setName(objectNode->first_attribute("name")->value());
+  p_camera->setPosition(pos);
+  p_camera->setRotation(rot);
+  p_camera->setScale(scl);
+
+  if (objectNode->first_attribute("isMain") != nullptr)
+  {
+    setCamera(p_camera);
+    p_camera->setIsActive(true);
+  }
+
+  addMesh(p_camera);
+}
+
+void R2::Scene::setupMeshObject(rapidxml::xml_node<> *objectNode)
+{
+  std::string path = objectNode->first_attribute("file")->value();
+  Model* p_model = new Model(m_papplication);
+  Shader* p_objectShader = new Shader(m_papplication->getUtils()->getFilePath("/shaders/default/default.vert"), m_papplication->getUtils()->getFilePath("/shaders/default/default.frag"));
+  p_objectShader->setup(m_papplication);
+  std::vector<R2::Mesh*> modelMeshes = p_model->loadFromFile(m_papplication->getUtils()->getFilePath(path), p_objectShader);
+
+  glm::vec3 pos = m_papplication->getUtils()->stringToVec3(objectNode->first_attribute("pos")->value());
+  glm::vec3 rot = glm::vec3(0.0f, 0.0f, 0.0f);
+
+  if (objectNode->first_attribute("rot") != nullptr)
+  {
+    rot = m_papplication->getUtils()->stringToVec3(objectNode->first_attribute("rot")->value());
+  }
+
+  glm::vec3 scl = glm::vec3(1.0f, 1.0f, 1.0f);
+
+  if (objectNode->first_attribute("scl") != nullptr)
+  {
+    scl = m_papplication->getUtils()->stringToVec3(objectNode->first_attribute("scl")->value());
+  }
+
+  if (modelMeshes.size() == 1)
+  {
+    modelMeshes[0]->setName(objectNode->first_attribute("name")->value());
+    modelMeshes[0]->setPosition(pos);
+    modelMeshes[0]->setRotation(rot);
+    modelMeshes[0]->setScale(scl);
+    addMesh(modelMeshes[0]);
+  }
+  else
+  {
+    MeshGroup* p_meshGroup = new MeshGroup();
+    p_meshGroup->setName(objectNode->first_attribute("name")->value());
+    for (Mesh* mesh : modelMeshes)
+    {
+      p_meshGroup->addMesh(mesh);
+    }
+    p_meshGroup->setPosition(pos);
+    p_meshGroup->setRotation(rot);
+    p_meshGroup->setScale(scl);
+    addMesh(p_meshGroup);
+  }
+}
+
+void R2::Scene::setupLightObject(rapidxml::xml_node<>* objectNode)
+{
+  glm::vec3 pos = m_papplication->getUtils()->stringToVec3(objectNode->first_attribute("pos")->value());
+  glm::vec3 rot = glm::vec3(0.0f, 0.0f, 0.0f);
+
+  if (objectNode->first_attribute("rot") != nullptr)
+  {
+    rot = m_papplication->getUtils()->stringToVec3(objectNode->first_attribute("rot")->value());
+  }
+
+  glm::vec3 scl = glm::vec3(1.0f, 1.0f, 1.0f);
+
+  if (objectNode->first_attribute("scl") != nullptr)
+  {
+    scl = m_papplication->getUtils()->stringToVec3(objectNode->first_attribute("scl")->value());
+  }
+
+  Light* p_light = new Light(m_papplication);
+  p_light->setName(objectNode->first_attribute("name")->value());
+
+  if (objectNode->first_attribute("type") != nullptr)
+  {
+    std::string type = objectNode->first_attribute("type")->value();
+    if (type == "point")
+    {
+      p_light->setIsPointLight(true);
+    }
+    else if (type == "directional")
+    {
+      p_light->setIsDirectionalLight(true);
+    }
+  }
+
+  if (objectNode->first_attribute("color") != nullptr)
+  {
+    glm::vec4 color = m_papplication->getUtils()->stringToVec4(objectNode->first_attribute("color")->value());
+    p_light->setColor(color);
+  }
+
+  if (objectNode->first_attribute("intensity") != nullptr)
+  {
+    float color = m_papplication->getUtils()->stringToFloat(objectNode->first_attribute("intensity")->value());
+    p_light->setIntensity(color);
+  }
+
+  if (objectNode->first_attribute("dir") != nullptr)
+  {
+    glm::vec3 direction = m_papplication->getUtils()->stringToVec3(objectNode->first_attribute("dir")->value());
+    p_light->setDirection(direction);
+  }
+
+  p_light->setPosition(pos);
+  p_light->setRotation(rot);
+  p_light->setScale(scl);
+  p_light->setup();
+  addMesh(p_light);
+}
+
+void R2::Scene::setupBillboardObject(rapidxml::xml_node<>* objectNode)
+{
+  glm::vec3 pos = m_papplication->getUtils()->stringToVec3(objectNode->first_attribute("pos")->value());
+  glm::vec3 rot = glm::vec3(0.0f, 0.0f, 0.0f);
+
+  if (objectNode->first_attribute("rot") != nullptr)
+  {
+    rot = m_papplication->getUtils()->stringToVec3(objectNode->first_attribute("rot")->value());
+  }
+
+  glm::vec3 scl = glm::vec3(1.0f, 1.0f, 1.0f);
+
+  if (objectNode->first_attribute("scl") != nullptr)
+  {
+    scl = m_papplication->getUtils()->stringToVec3(objectNode->first_attribute("scl")->value());
+  }
+
+  std::string texturePath = m_papplication->getUtils()->getFilePath("/resources/default.png");
+
+  if (objectNode->first_attribute("texture") != nullptr)
+  {
+    texturePath = m_papplication->getUtils()->getFilePath(objectNode->first_attribute("texture")->value());
+  }
+
+  Billboard* p_billboard = new Billboard(m_papplication, texturePath);
+  p_billboard->setName(objectNode->first_attribute("name")->value());
+  p_billboard->setPosition(pos);
+  p_billboard->setRotation(rot);
+  p_billboard->setScale(scl);
+  p_billboard->setup();
+  addMesh(p_billboard);
 }

@@ -8,6 +8,12 @@ R2::VAO::VAO()
   std::cout << "VAO created with ID: " << m_ID << std::endl;
 }
 
+R2::VAO::~VAO()
+{
+  std::cout << "VAO::~VAO()" << m_ID << std::endl;
+  cleanup();
+}
+
 void R2::VAO::linkAttrib(VBO &VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void *p_offset)
 {
   VBO.bind();

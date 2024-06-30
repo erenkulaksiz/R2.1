@@ -15,7 +15,7 @@ namespace R2
     void updateViewMatrix();
     void updateProjectionMatrix();
     void updateMatrix();
-    void setActive(bool isActive);
+    void setIsActive(bool isActive);
     void setFov(float fov);
     bool getIsActive();
     float getFov();

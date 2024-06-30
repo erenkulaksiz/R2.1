@@ -11,6 +11,7 @@ namespace R2
   {
   public:
     EBO(GLuint *p_indices, GLsizeiptr size);
+    ~EBO();
     void cleanup();
     GLuint m_ID;
     void bind();

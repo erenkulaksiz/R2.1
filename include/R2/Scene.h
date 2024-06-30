@@ -27,7 +27,6 @@ namespace R2
     void setIsActiveScene(bool m_isActiveScene);
     std::string getName();
     void setName(std::string m_name);
-    virtual void setup() = 0;
     void cleanup();
     void loop();
     std::vector<Mesh *> getMeshes();
@@ -40,7 +39,7 @@ namespace R2
     Mesh *getMesh(std::string name);
     Mesh *getMesh(int index);
     Mesh *lineMesh(glm::vec3 start, glm::vec3 end, glm::vec4 color);
-    void loadMeshes();
+    void setup();
     void reload();
     void setClearColor(glm::vec4 clearColor);
     glm::vec4 getClearColor();
@@ -49,10 +48,12 @@ namespace R2
     void setIsLightsActive(bool isLightsActive);
     bool getIsLightsActive();
     Application *getApplication();
+    void setIsPlaying(bool isPlaying);
+    bool getIsPlaying();
 
   protected:
     Application *m_papplication;
-    Camera *m_pcamera;
+    Camera* m_pcamera = nullptr;
     std::vector<Mesh *> m_meshes;
     std::vector<Light *> m_pointLights;
     std::vector<Light *> m_directionalLights;
@@ -61,7 +62,12 @@ namespace R2
     bool m_isStartedSetup = false;
     bool m_isActiveScene = false;
     bool m_isLightsActive = true;
+    bool m_isPlaying = false;
     std::string m_name;
+    void setupCameraObject(rapidxml::xml_node<> *objectNode);
+    void setupMeshObject(rapidxml::xml_node<> *objectNode);
+    void setupLightObject(rapidxml::xml_node<> *objectNode);
+    void setupBillboardObject(rapidxml::xml_node<> *objectNode);
   };
 }
 

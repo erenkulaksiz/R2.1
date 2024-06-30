@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -66,6 +67,20 @@ std::vector<R2::Mesh *> R2::Model::loadFromFile(std::string fileName, Shader *p_
         texture->setIsDiffuse(true);
         model->addTexture(texture);
       }
+
+      if (material->GetTexture(aiTextureType_HEIGHT, 0, &texturePath) == AI_SUCCESS)
+      {
+        std::string textureFilePath = m_papplication->getUtils()->getCurrentPath() + "/resources/" + std::string(texturePath.C_Str());
+
+        std::cout << "normal texture path: " << textureFilePath << std::endl;
+
+        R2::Texture* texture = new R2::Texture(textureFilePath, GL_TEXTURE_2D, GL_TEXTURE1, GL_UNSIGNED_BYTE);
+        texture->setup();
+        texture->texUnit(p_shader, "material.normal", 1);
+        texture->setShininess(1.0f);
+        texture->setIsNormal(true);
+        model->addTexture(texture);
+      }
     }
 
     for (unsigned int j = 0; j < mesh->mNumVertices; j++)
@@ -105,6 +120,40 @@ std::vector<R2::Mesh *> R2::Model::loadFromFile(std::string fileName, Shader *p_
     }
 
     model->setIndices(indices.data(), sizeof(indices[0]) * indices.size());
+
+    glm::vec3 min = glm::vec3(1000000.0f);
+    glm::vec3 max = glm::vec3(-1000000.0f);
+
+    for (unsigned int j = 0; j < mesh->mNumVertices; j++)
+    {
+      if (mesh->mVertices[j].x < min.x)
+      {
+        min.x = mesh->mVertices[j].x;
+      }
+      if (mesh->mVertices[j].y < min.y)
+      {
+        min.y = mesh->mVertices[j].y;
+      }
+      if (mesh->mVertices[j].z < min.z)
+      {
+        min.z = mesh->mVertices[j].z;
+      }
+
+      if (mesh->mVertices[j].x > max.x)
+      {
+        max.x = mesh->mVertices[j].x;
+      }
+      if (mesh->mVertices[j].y > max.y)
+      {
+        max.y = mesh->mVertices[j].y;
+      }
+      if (mesh->mVertices[j].z > max.z)
+      {
+        max.z = mesh->mVertices[j].z;
+      }
+    }
+
+    model->setBoundingBox(min, max);
     model->setup();
     meshes.push_back(model);
   }

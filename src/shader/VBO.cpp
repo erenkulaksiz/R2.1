@@ -10,6 +10,12 @@ R2::VBO::VBO(GLfloat *p_vertices, GLsizeiptr size)
   std::cout << "VBO created with ID: " << m_ID << std::endl;
 }
 
+R2::VBO::~VBO()
+{
+  std::cout << "VBO::~VBO()" << m_ID << std::endl;
+  cleanup();
+}
+
 void R2::VBO::bind()
 {
   glBindBuffer(GL_ARRAY_BUFFER, m_ID);
