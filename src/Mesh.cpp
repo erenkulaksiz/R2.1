@@ -392,16 +392,16 @@ void R2::Mesh::cleanup()
 {
   std::cout << "R2::Mesh::cleanup() " << m_name << std::endl;
 
-  if (m_isCamera || m_isLight)
+  if (m_isCamera || m_isGroup || m_isLight)
     return;
 
-  m_pvao->cleanup();
-  m_pvbo->cleanup();
-  m_pebo->cleanup();
+  delete m_pvao;
+  delete m_pvbo;
+  delete m_pebo;
 
   for (size_t i = 0; i < m_ptextures.size(); i++)
   {
-    m_ptextures[i]->cleanup();
+    delete m_ptextures[i];
   }
 }
 

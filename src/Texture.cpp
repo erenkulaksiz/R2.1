@@ -21,6 +21,12 @@ R2::Texture::Texture(GLenum texType, GLenum slot, GLenum pixelType)
   this->m_pixelType = pixelType;
 }
 
+R2::Texture::~Texture()
+{
+  std::cout << "Texture::~Texture()" << std::endl;
+  cleanup();
+}
+
 void R2::Texture::setup()
 {
   std::cout << "Texture::setup()" << std::endl;

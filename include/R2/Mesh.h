@@ -28,7 +28,7 @@ namespace R2
     Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, Shader *shader);
     Mesh(Shader *shader);
     Mesh();
-    ~Mesh();
+    virtual ~Mesh();
     virtual void setup();
     void setIndices(unsigned int *indices, size_t indexCount);
     void setVertices(float *vertices, size_t vertexCount);

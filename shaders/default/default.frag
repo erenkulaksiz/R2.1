@@ -97,7 +97,7 @@ float PointLightShadowCalculation(PointLight light, vec3 fragPos) {
         }
     }
     shadow /= samples;
-
+    
     return shadow;
 }
 

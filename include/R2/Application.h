@@ -46,6 +46,7 @@ namespace R2
     Shader *getDirectionalDepthShader();
     Shader *getPointDepthShader();
     Shader *getBoundingBoxShader();
+    Shader *getDefaultObjectShader();
 
   private:
     GLFWwindow *m_pwindow;
@@ -70,7 +71,8 @@ namespace R2
     float m_previousFrame;
     Shader *m_pdirectionalDepthShader;
     Shader *m_ppointDepthShader;
-    Shader* m_pboundingBoxShader;
+    Shader *m_pboundingBoxShader;
+    Shader *m_defaultObjectShader;
   };
 }
 

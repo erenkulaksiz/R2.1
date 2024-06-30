@@ -221,10 +221,9 @@ void R2::Light::cleanup()
   std::cout << "R2::Light::cleanup()" << std::endl;
   glDeleteFramebuffers(1, &m_depthMapFBO);
   glDeleteTextures(1, &m_depthMap);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-  m_pvao->cleanup();
-  m_pvbo->cleanup();
-  m_pebo->cleanup();
+  Billboard::cleanup();
 }
 
 void R2::Light::setNearPlane(float nearPlane)

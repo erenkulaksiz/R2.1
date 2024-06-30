@@ -17,6 +17,7 @@ namespace R2
   public:
     Texture(std::string imagePath, GLenum texType, GLenum slot, GLenum pixelType);
     Texture(GLenum texType, GLenum slot, GLenum pixelType);
+    ~Texture();
     void texUnit(Shader *p_shader, const char *p_uniform, GLuint unit);
     void bind();
     void setup();

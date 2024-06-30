@@ -34,7 +34,8 @@ void R2::MeshGroup::cleanup()
   std::cout << "R2::MeshGroup::cleanup()" << std::endl;
   for (size_t i = 0; i < m_meshes.size(); i++)
   {
-    m_meshes[i]->cleanup();
+    std::cout << "R2::MeshGroup::cleanup() deleting mesh " << m_meshes[i]->getName() << std::endl;
+    delete m_meshes[i];
   }
 }
 
@@ -53,7 +54,7 @@ void R2::MeshGroup::setRotation(glm::vec3 rotation)
   glm::quat oldRotationQuat = glm::quat(glm::radians(m_rotation));
   glm::quat newRotationQuat = glm::quat(glm::radians(rotation));
   glm::quat rotationOffset = glm::inverse(oldRotationQuat) * newRotationQuat;
-
+  
   m_rotation = rotation;
 
   for (size_t i = 0; i < m_meshes.size(); i++)
@@ -72,6 +73,7 @@ void R2::MeshGroup::setScale(glm::vec3 scale)
 {
   glm::vec3 scaleOffset = scale / m_scale;
   m_scale = scale;
+  
   for (size_t i = 0; i < m_meshes.size(); i++)
   {
     glm::vec3 relativePosition = m_meshes[i]->getPosition() - m_position;

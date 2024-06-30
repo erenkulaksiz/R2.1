@@ -16,7 +16,6 @@ namespace R2
   public:
     Shader(std::string vertexPath, std::string fragmentPath);
     Shader(std::string vertexPath, std::string fragmentPath, std::string geometryPath);
-    // destructor
     ~Shader();
     void setup(Application *p_application);
     void setVec3(std::string name, glm::vec3 value);
@@ -31,7 +30,6 @@ namespace R2
     void cleanup();
 
   protected:
-    void compileErrors(unsigned int shader, const char *type);
     std::string m_vertexPath;
     std::string m_fragmentPath;
     std::string m_geometryPath = "";

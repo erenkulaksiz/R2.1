@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <application>
 	<scenes>
-		<scene name="TestScene" isDefault="true">
-			<mesh name="CubePlane" file="/resources/testcube.obj" pos="0,0,0" scl="10,0.5,10" />
-      <mesh name="TestCube" file="/resources/testcube.obj" pos="0,2,0" rot="60,60,60" />
-      <mesh name="Cybertruck" file="/resources/Cybertruck.obj" pos="0,5,0" />
+    <scene name="GroupTest">
+      <mesh name="TestObject" file="/resources/grouptest.obj" pos="0,0,0" shader="default" />
+      <light name="RedPointLight" pos="0,2,5" type="point" color="1,0,0,1" intensity="1" />
+      <camera name="MainCamera" pos="-9.5,9.3,1.6" rot="-44.5,349.6,0" isMain="true" />
+    </scene>
+    <scene name="TestScene" isDefault="true">
+      <mesh name="CubePlane" file="/resources/testcube.obj" pos="0,0,0" scl="10,0.5,10" shader="default" />
+      <mesh name="TestCube" file="/resources/testcube.obj" pos="0,2,0" rot="60,60,60" shader="default" />
+      <mesh name="Cybertruck" file="/resources/Cybertruck.obj" pos="0,5,0" shader="default" />
       <light name="RedPointLight" pos="0,2,5" type="point" color="1,0,0,1" intensity="1" />
       <light name="BluePointLight" pos="3,1,4" type="point" color="0,1,0,1" intensity="2" />
       <camera name="MainCamera" pos="-9.5,9.3,1.6" rot="-44.5,349.6,0" isMain="true" />
       <camera name="SecondCamera" pos="5.2,5,5" />
-		</scene>
+    </scene>
     <scene name="TestScene2">
-      <mesh name="TestCube" file="/resources/testcube.obj" pos="0,0,0" />
+      <mesh name="TestCube" file="/resources/testcube.obj" pos="0,0,0" shader="default" />
       <light name="PointLight" pos="5,5,5" type="point" color="1,1,1,1" intensity="1" />
       <camera name="MainCamera" pos="0,0,0" isMain="true" />
     </scene>
@@ -20,15 +25,21 @@
       <camera name="MainCamera" pos="0,0,0" isMain="true" />
     </scene>
     <scene name="DirectionalLightTest">
-      <mesh name="CubePlane" file="/resources/testcube.obj" pos="0,0,0" scl="10,0.5,10" />
-      <mesh name="TestCube" file="/resources/testcube.obj" pos="0,2,0" rot="60,60,60" />
+      <mesh name="CubePlane" file="/resources/testcube.obj" pos="0,0,0" scl="10,0.5,10" shader="default" />
+      <mesh name="TestCube" file="/resources/testcube.obj" pos="0,2,0" rot="60,60,60" shader="default" />
       <light name="DirectionalLight" pos="0,20,5" type="directional" color="1,1,1,1" intensity="1" dir="-1,-1,0" />
       <camera name="MainCamera" pos="0,0,0" isMain="true" />
     </scene>
     <scene name="PhysicsTest">
-      <mesh name="CubePlane" file="/resources/testcube.obj" pos="0,0,0" scl="10,0.5,10" />
-      <mesh name="TestCube" file="/resources/testcube.obj" pos="0,6,0" rot="60,60,60" />
+      <mesh name="CubePlane" file="/resources/testcube.obj" pos="0,0,0" scl="10,0.5,10" shader="default" />
+      <mesh name="TestCube" file="/resources/testcube.obj" pos="0,6,0" rot="60,60,60" shader="default" />
       <light name="DirectionalLight" pos="0,20,5" type="directional" color="1,1,1,1" intensity="1" dir="-1,-1,0" />
+      <camera name="MainCamera" pos="-9.5,9.3,1.6" rot="-44.5,349.6,0" isMain="true" />
+    </scene>
+    <scene name="SponzaTest">
+      <mesh name="Sponza" file="/resources/sponza.obj" pos="0,0,0" shader="default" />
+      <light name="RedPointLight" pos="0,2,5" type="point" color="1,0,0,1" intensity="1" />
+      <light name="BluePointLight" pos="10,5,4" type="point" color="0,1,0,1" intensity="2" />
       <camera name="MainCamera" pos="-9.5,9.3,1.6" rot="-44.5,349.6,0" isMain="true" />
     </scene>
 	</scenes>

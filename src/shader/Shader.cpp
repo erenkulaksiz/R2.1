@@ -54,7 +54,7 @@ R2::Shader::Shader(std::string vertexPath, std::string fragmentPath, std::string
 
 R2::Shader::~Shader()
 {
-  std::cout << "Shader::~Shader()" << std::endl;
+  std::cout << "Shader::~Shader() " << m_ID << std::endl;
   cleanup();
 }
 

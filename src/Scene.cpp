@@ -129,9 +129,6 @@ void R2::Scene::loop()
 
 R2::Mesh *R2::Scene::lineMesh(glm::vec3 start, glm::vec3 end, glm::vec4 color)
 {
-  Shader *p_shader = new Shader(m_papplication->getUtils()->getFilePath("/shaders/line/line.vert"), m_papplication->getUtils()->getFilePath("/shaders/line/line.frag"));
-  p_shader->setup(m_papplication);
-
   float lineVertices[6] = {
       start.x, start.y, start.z,
       end.x, end.y, end.z};
@@ -139,7 +136,7 @@ R2::Mesh *R2::Scene::lineMesh(glm::vec3 start, glm::vec3 end, glm::vec4 color)
   unsigned int lineIndices[2] = {
       0, 1};
 
-  Mesh *p_lineMesh = new Mesh(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), p_shader);
+  Mesh *p_lineMesh = new Mesh(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), m_papplication->getBoundingBoxShader());
   p_lineMesh->setName("LineMesh");
   p_lineMesh->setIsLine(true);
   p_lineMesh->setVertices(lineVertices, sizeof(lineVertices));
@@ -153,14 +150,17 @@ R2::Mesh *R2::Scene::lineMesh(glm::vec3 start, glm::vec3 end, glm::vec4 color)
 
 void R2::Scene::cleanup()
 {
-  std::cout << "Scene::cleanup()" << std::endl;
-  for (Mesh *mesh : m_meshes)
-  {
-    mesh->cleanup();
-  }
-  m_meshes = std::vector<Mesh *>();
+  std::cout << "Scene::cleanup() " << m_name << std::endl;
   m_isSetup = false;
   m_isStartedSetup = false;
+  m_pcamera = nullptr;
+  for (Mesh *p_mesh : m_meshes)
+  {
+    delete p_mesh;
+  }
+  m_meshes.clear();
+  m_directionalLights.clear();
+  m_pointLights.clear();
 }
 
 std::vector<R2::Camera *> R2::Scene::getCameras()
@@ -178,9 +178,6 @@ std::vector<R2::Camera *> R2::Scene::getCameras()
 
 void R2::Scene::addGridMesh()
 {
-  Shader *p_shader = new Shader(m_papplication->getUtils()->getFilePath("/shaders/line/line.vert"), m_papplication->getUtils()->getFilePath("/shaders/line/line.frag"));
-  p_shader->setup(m_papplication);
-
   float gridSize = 300.0f;
   int divisions = 100;
   
@@ -217,7 +214,7 @@ void R2::Scene::addGridMesh()
     indices.push_back(static_cast<unsigned int>(i));
   }
 
-  Mesh *p_gridMesh = new Mesh(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f), p_shader);
+  Mesh *p_gridMesh = new Mesh(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f), m_papplication->getBoundingBoxShader());
   p_gridMesh->setName("GridMesh");
   p_gridMesh->setIsLine(true);
   p_gridMesh->setVertices(vertices.data(), vertices.size() * sizeof(float));
@@ -249,6 +246,12 @@ R2::Mesh *R2::Scene::getMesh(int index)
 void R2::Scene::setup()
 {
   std::cout << "Scene::setup()" << std::endl;
+
+  if (m_isStartedSetup)
+  {
+    std::cout << "Scene::setup() Already started setup" << std::endl;
+    return;
+  }
 
   m_isSetup = false;
   m_isStartedSetup = true;
@@ -294,8 +297,8 @@ void R2::Scene::setup()
 
 void R2::Scene::reload()
 {
+  std::cout << "Scene::reload() " << m_name << std::endl;
   cleanup();
-  m_meshes.clear();
   setup();
 }
 
@@ -384,9 +387,22 @@ void R2::Scene::setupCameraObject(rapidxml::xml_node<> *objectNode)
 void R2::Scene::setupMeshObject(rapidxml::xml_node<> *objectNode)
 {
   std::string path = objectNode->first_attribute("file")->value();
-  Model* p_model = new Model(m_papplication);
-  Shader* p_objectShader = new Shader(m_papplication->getUtils()->getFilePath("/shaders/default/default.vert"), m_papplication->getUtils()->getFilePath("/shaders/default/default.frag"));
-  p_objectShader->setup(m_papplication);
+  Model *p_model = new Model(m_papplication);
+  Shader *p_objectShader = nullptr;
+
+  if (objectNode->first_attribute("shader") != nullptr)
+  {
+    std::string type = objectNode->first_attribute("shader")->value();
+
+    std::cout << "Shader type: " << type << std::endl;
+
+    if (std::string(type) == std::string("default"))
+    {
+      std::cout << "Default shader" << std::endl;
+      p_objectShader = m_papplication->getDefaultObjectShader();
+    }
+  }
+
   std::vector<R2::Mesh*> modelMeshes = p_model->loadFromFile(m_papplication->getUtils()->getFilePath(path), p_objectShader);
 
   glm::vec3 pos = m_papplication->getUtils()->stringToVec3(objectNode->first_attribute("pos")->value());

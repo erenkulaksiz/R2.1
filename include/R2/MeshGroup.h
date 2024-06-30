@@ -10,7 +10,7 @@ namespace R2
   {
   public:
     MeshGroup();
-    ~MeshGroup();
+    ~MeshGroup() override;
     void addMesh(Mesh *p_mesh);
     void render(Camera *p_camera, Scene *p_scene) override;
     void cleanup() override;

@@ -65,8 +65,6 @@ bool R2::Application::setup()
   m_pimgui = new Imgui(this);
   m_pinput = new Input(this);
   m_pconfig = new Config(this);
-  m_psceneManager = new SceneManager(this);
-  m_psceneManager->loadScenes();
 
   m_pdirectionalDepthShader = new Shader(m_putils->getFilePath("/shaders/shadow/shadow.vert"), m_putils->getFilePath("/shaders/shadow/shadow.frag"));
   m_pdirectionalDepthShader->setup(this);
@@ -76,6 +74,12 @@ bool R2::Application::setup()
 
   m_pboundingBoxShader = new Shader(m_putils->getFilePath("/shaders/line/line.vert"), m_putils->getFilePath("/shaders/line/line.frag"));
   m_pboundingBoxShader->setup(this);
+
+  m_defaultObjectShader = new Shader(m_putils->getFilePath("/shaders/default/default.vert"), m_putils->getFilePath("/shaders/default/default.frag"));
+  m_defaultObjectShader->setup(this);
+
+  m_psceneManager = new SceneManager(this);
+  m_psceneManager->loadScenes();
 
   glfwSetWindowSizeCallback(m_pwindow, [](GLFWwindow *window, int width, int height)
                             {
@@ -268,4 +272,9 @@ R2::Shader *R2::Application::getPointDepthShader()
 R2::Shader *R2::Application::getBoundingBoxShader()
 {
   return m_pboundingBoxShader;
+}
+
+R2::Shader *R2::Application::getDefaultObjectShader()
+{
+  return m_defaultObjectShader;
 }
