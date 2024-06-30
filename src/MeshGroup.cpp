@@ -9,6 +9,12 @@ R2::MeshGroup::MeshGroup() : Mesh()
   m_isGroup = true;
 }
 
+R2::MeshGroup::~MeshGroup()
+{
+  std::cout << "R2::MeshGroup::~MeshGroup()" << std::endl;
+  cleanup();
+}
+
 void R2::MeshGroup::addMesh(Mesh *p_mesh)
 {
   std::cout << "R2::MeshGroup::addMesh()" << std::endl;

@@ -50,6 +50,10 @@ namespace R2
     Application *getApplication();
     void setIsPlaying(bool isPlaying);
     bool getIsPlaying();
+    glm::vec3 getGravityDirection();
+    void setGravityDirection(glm::vec3 gravityDirection);
+    void setGravityForce(float gravity);
+    float getGravityForce();
 
   protected:
     Application *m_papplication;
@@ -58,11 +62,13 @@ namespace R2
     std::vector<Light *> m_pointLights;
     std::vector<Light *> m_directionalLights;
     glm::vec4 m_clearColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    glm::vec3 m_gravityDirection = glm::vec3(0.0f, -1.0f, 0.0f);
     bool m_isSetup = false;
     bool m_isStartedSetup = false;
     bool m_isActiveScene = false;
     bool m_isLightsActive = true;
     bool m_isPlaying = false;
+    float m_gravityForce = 9.8f;
     std::string m_name;
     void setupCameraObject(rapidxml::xml_node<> *objectNode);
     void setupMeshObject(rapidxml::xml_node<> *objectNode);

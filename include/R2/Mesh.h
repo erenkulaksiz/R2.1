@@ -28,6 +28,7 @@ namespace R2
     Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, Shader *shader);
     Mesh(Shader *shader);
     Mesh();
+    ~Mesh();
     virtual void setup();
     void setIndices(unsigned int *indices, size_t indexCount);
     void setVertices(float *vertices, size_t vertexCount);
@@ -77,6 +78,16 @@ namespace R2
     bool getIsDrawingBoundingBox();
     void setBoundingBox(glm::vec3 min, glm::vec3 max);
     virtual void drawBoundingBox(Scene* p_scene);
+    void applyForce(glm::vec3 force);
+    void updatePhysics(float deltaTime, glm::vec3 gravity);
+    void setMass(float mass);
+    float getMass();
+    void setIsAffectedByGravity(bool isAffectedByGravity);
+    bool getIsAffectedByGravity();
+    void setHasPhysics(bool hasPhysics);
+    bool getHasPhysics();
+    glm::vec3 getVelocity();
+    void setVelocity(glm::vec3 velocity);
 
   protected:
     Shader *m_pshader;
@@ -85,6 +96,11 @@ namespace R2
     glm::vec3 m_rotation = glm::vec3(0.0f);
     glm::vec3 m_scale = glm::vec3(1.0f);
     glm::vec4 m_color = glm::vec4(1.0f);
+    glm::vec3 m_velocity = glm::vec3(0.0f);
+    glm::vec3 m_acceleration = glm::vec3(0.0f);
+    float m_mass = 0.0f;
+    bool m_isAffectedByGravity = true;
+    bool m_hasPhysics = false;
     VAO *m_pvao;
     VBO *m_pvbo;
     EBO *m_pebo;

@@ -40,6 +40,7 @@ namespace R2
     void renderLightSettings(Light *p_light);
     void renderMeshGeneral(Mesh *p_mesh);
     void renderMeshTransform(Mesh *p_mesh);
+    void renderMeshPhysics(Mesh *p_mesh);
     void renderScenes(std::vector<Scene *> scenes);
     void renderMeshTextures(Mesh *p_mesh);
   };

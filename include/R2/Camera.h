@@ -58,7 +58,7 @@ namespace R2
     bool m_isOrthographic = false;
     bool m_isFreecam = true;
     bool m_isActive = false;
-    bool m_firstMouse = true;
+    bool m_isFirstMouse = true;
   };
 }
 

@@ -7,7 +7,7 @@
       <mesh name="Cybertruck" file="/resources/Cybertruck.obj" pos="0,5,0" />
       <light name="RedPointLight" pos="0,2,5" type="point" color="1,0,0,1" intensity="1" />
       <light name="BluePointLight" pos="3,1,4" type="point" color="0,1,0,1" intensity="2" />
-      <camera name="MainCamera" pos="0,0,0" isMain="true" />
+      <camera name="MainCamera" pos="-9.5,9.3,1.6" rot="-44.5,349.6,0" isMain="true" />
       <camera name="SecondCamera" pos="5.2,5,5" />
 		</scene>
     <scene name="TestScene2">
@@ -24,6 +24,12 @@
       <mesh name="TestCube" file="/resources/testcube.obj" pos="0,2,0" rot="60,60,60" />
       <light name="DirectionalLight" pos="0,20,5" type="directional" color="1,1,1,1" intensity="1" dir="-1,-1,0" />
       <camera name="MainCamera" pos="0,0,0" isMain="true" />
+    </scene>
+    <scene name="PhysicsTest">
+      <mesh name="CubePlane" file="/resources/testcube.obj" pos="0,0,0" scl="10,0.5,10" />
+      <mesh name="TestCube" file="/resources/testcube.obj" pos="0,6,0" rot="60,60,60" />
+      <light name="DirectionalLight" pos="0,20,5" type="directional" color="1,1,1,1" intensity="1" dir="-1,-1,0" />
+      <camera name="MainCamera" pos="-9.5,9.3,1.6" rot="-44.5,349.6,0" isMain="true" />
     </scene>
 	</scenes>
 	<config>

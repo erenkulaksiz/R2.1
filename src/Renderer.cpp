@@ -21,6 +21,7 @@ void R2::Renderer::render(Camera *p_camera, Scene *p_scene)
       continue;
     }
 
+    mesh->updatePhysics(m_papplication->getDeltaTime(), m_papplication->getSceneManager()->getCurrentScene()->getGravityDirection());
     mesh->render(p_camera, p_scene);
   }
 }
@@ -38,6 +39,7 @@ void R2::Renderer::render(Camera *p_camera, Scene *p_scene, Shader *p_shader)
       continue;
     }
 
+    mesh->updatePhysics(m_papplication->getDeltaTime(), m_papplication->getSceneManager()->getCurrentScene()->getGravityDirection());
     mesh->render(p_camera, p_scene, p_shader);
   }
 }

@@ -153,6 +153,7 @@ void R2::Imgui::renderMeshInspector(Mesh *p_mesh)
 
   renderMeshGeneral(p_mesh);
   renderMeshTransform(p_mesh);
+  renderMeshPhysics(p_mesh);
 
   if (p_mesh->getIsCamera())
   {
@@ -204,6 +205,42 @@ void R2::Imgui::renderMeshGeneral(Mesh *p_mesh)
           p_mesh->setIsDrawingBoundingBox(isDrawingBoundingBox);
         }
       }
+    }
+  }
+}
+
+void R2::Imgui::renderMeshPhysics(Mesh* p_mesh)
+{
+  if (p_mesh->getIsGroup() || p_mesh->getIsLight() || p_mesh->getIsCamera())
+  {
+    return;
+  }
+
+  if (ImGui::CollapsingHeader("physics"))
+  {
+    glm::vec3 velocity = p_mesh->getVelocity();
+    float velocityVec3[3] = {velocity.x, velocity.y, velocity.z};
+    if (ImGui::DragFloat3("velocity", velocityVec3, 0.1f, -1000.0f, 1000.0f, "%.1f"))
+    {
+      p_mesh->setVelocity(glm::vec3(velocityVec3[0], velocityVec3[1], velocityVec3[2]));
+    }
+
+    float mass = p_mesh->getMass();
+    if (ImGui::DragFloat("mass", &mass, 0.1f, 0.0f, 100.0f))
+    {
+      p_mesh->setMass(mass);
+    }
+
+    bool hasPhysics = p_mesh->getHasPhysics();
+    if (ImGui::Checkbox("has physics", &hasPhysics))
+    {
+      p_mesh->setHasPhysics(hasPhysics);
+    }
+
+    bool isAffectedByGravity = p_mesh->getIsAffectedByGravity();
+    if (ImGui::Checkbox("gravity", &isAffectedByGravity))
+    {
+      p_mesh->setIsAffectedByGravity(isAffectedByGravity);
     }
   }
 }
@@ -483,16 +520,33 @@ void R2::Imgui::renderScene(Scene *p_scene)
       p_scene->reload();
     }
     ImGui::Text("name: %s", p_scene->getName().c_str());
-    // ImGui::Text("mesh count: %d", p_scene->getMeshes().size()); takes account for invisible meshes + needs to take care of meshgroup
+
     float clearColor[3] = {p_scene->getClearColor().r, p_scene->getClearColor().g, p_scene->getClearColor().b};
     if (ImGui::ColorEdit3("clear color", clearColor))
     {
       p_scene->setClearColor(glm::vec4(clearColor[0], clearColor[1], clearColor[2], 1.0f));
     }
+
     bool isLightsActive = p_scene->getIsLightsActive();
     if (ImGui::Checkbox("lights", &isLightsActive))
     {
       p_scene->setIsLightsActive(isLightsActive);
+    }
+
+    if (ImGui::CollapsingHeader("physics"))
+    {
+      glm::vec3 gravityDirection = p_scene->getGravityDirection();
+      float gravityDirectionVec3[3] = { gravityDirection.x, gravityDirection.y, gravityDirection.z };
+      if (ImGui::DragFloat3("gravity direction", gravityDirectionVec3, 0.1f, -1000.0f, 1000.0f, "%.1f"))
+      {
+        p_scene->setGravityDirection(glm::vec3(gravityDirectionVec3[0], gravityDirectionVec3[1], gravityDirectionVec3[2]));
+      }
+
+      float gravity = p_scene->getGravityForce();
+      if (ImGui::DragFloat("gravity force", &gravity, 0.1f, 0.0f, 50.0f))
+      {
+        p_scene->setGravityForce(gravity);
+      }
     }
   }
 }

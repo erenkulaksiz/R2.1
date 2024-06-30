@@ -54,6 +54,12 @@ R2::Mesh::Mesh()
   std::cout << "R2::Mesh::Mesh()" << std::endl;
 }
 
+R2::Mesh::~Mesh()
+{
+  std::cout << "R2::Mesh::~Mesh()" << std::endl;
+  cleanup();
+}
+
 void R2::Mesh::setup()
 {
   std::cout << "R2::Mesh::setup()" << std::endl;
@@ -384,7 +390,7 @@ bool R2::Mesh::getIsVisibleOnMenu()
 
 void R2::Mesh::cleanup()
 {
-  std::cout << "R2::Mesh::cleanup()" << std::endl;
+  std::cout << "R2::Mesh::cleanup() " << m_name << std::endl;
 
   if (m_isCamera || m_isLight)
     return;
@@ -633,4 +639,69 @@ void R2::Mesh::setBoundingBox(glm::vec3 min, glm::vec3 max)
 {
   m_boundingBoxMin = min;
   m_boundingBoxMax = max;
+}
+
+void R2::Mesh::applyForce(glm::vec3 force)
+{
+  if (m_mass == 0.0f)
+  {
+    std::cout << "R2::Mesh::applyForce() mass is 0.0f" << std::endl;
+    return;
+  }
+  m_acceleration += force / m_mass;
+}
+
+void R2::Mesh::updatePhysics(float deltaTime, glm::vec3 gravity)
+{
+  if(!m_hasPhysics)
+  {
+    return;
+  }
+  if (m_isAffectedByGravity)
+  {
+    applyForce(gravity * m_mass);
+  }
+  m_velocity += m_acceleration * deltaTime;
+  m_position += m_velocity * deltaTime;
+  m_acceleration = glm::vec3(0.0f);
+}
+
+void R2::Mesh::setMass(float mass)
+{
+  m_mass = mass;
+}
+
+float R2::Mesh::getMass()
+{
+  return m_mass;
+}
+
+void R2::Mesh::setIsAffectedByGravity(bool isAffectedByGravity)
+{
+  m_isAffectedByGravity = isAffectedByGravity;
+}
+
+bool R2::Mesh::getIsAffectedByGravity()
+{
+  return m_isAffectedByGravity;
+}
+
+void R2::Mesh::setHasPhysics(bool hasPhysics)
+{
+  m_hasPhysics = hasPhysics;
+}
+
+bool R2::Mesh::getHasPhysics()
+{
+  return m_hasPhysics;
+}
+
+glm::vec3 R2::Mesh::getVelocity()
+{
+  return m_velocity;
+}
+
+void R2::Mesh::setVelocity(glm::vec3 velocity)
+{
+  m_velocity = velocity;
 }

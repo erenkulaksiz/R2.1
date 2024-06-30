@@ -79,7 +79,7 @@ void R2::Camera::loop()
   {
     if (m_papplication->getIsMouseVisible())
     {
-      m_firstMouse = true;
+      m_isFirstMouse = true;
       return;
     }
 
@@ -112,7 +112,7 @@ void R2::Camera::loop()
         m_position.x += cameraSpeed;
       }
     }
-    else
+    else if (m_isPerspective)
     {
       if (m_papplication->getInput()->isPressedKey(GLFW_KEY_W))
       {
@@ -143,11 +143,11 @@ void R2::Camera::loop()
     double x = m_papplication->getInput()->getMouseX();
     double y = m_papplication->getInput()->getMouseY();
 
-    if (m_firstMouse)
+    if (m_isFirstMouse)
     {
       m_lastX = x;
       m_lastY = y;
-      m_firstMouse = false;
+      m_isFirstMouse = false;
     }
 
     float xOffset = x - m_lastX;
@@ -257,7 +257,28 @@ void R2::Camera::setPosition(glm::vec3 position)
 
 void R2::Camera::setRotation(glm::vec3 rotation)
 {
-  m_rotation = rotation;
+  m_yaw = rotation.y;
+  m_pitch = rotation.x;
+  m_isFirstMouse = true;
+
+  if (m_pitch > 89.0f)
+    m_pitch = 89.0f;
+  if (m_pitch < -89.0f)
+    m_pitch = -89.0f;
+
+  if (m_yaw > 360.0f)
+    m_yaw = 0.0f;
+  if (m_yaw < 0.0f)
+    m_yaw = 360.0f;
+
+  glm::vec3 direction;
+  direction.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+  direction.y = sin(glm::radians(m_pitch));
+  direction.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+
+  m_cameraFront = glm::normalize(direction);
+  m_rotation = glm::vec3(m_pitch, m_yaw, 0);
+
   updateMatrix();
 }
 

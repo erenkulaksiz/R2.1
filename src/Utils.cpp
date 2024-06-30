@@ -115,3 +115,8 @@ float R2::Utils::stringToFloat(std::string floatString)
 {
   return std::stof(floatString);
 }
+
+bool R2::Utils::stringToBool(std::string boolString)
+{
+  return (boolString == "true");
+}

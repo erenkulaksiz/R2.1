@@ -17,6 +17,7 @@ namespace R2
     glm::vec3 stringToVec3(std::string vec3String);
     glm::vec4 stringToVec4(std::string vec4String);
     float stringToFloat(std::string floatString);
+    bool stringToBool(std::string boolString);
 
   private:
     std::string m_executableFolder = "";

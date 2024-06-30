@@ -365,7 +365,7 @@ void R2::Scene::setupCameraObject(rapidxml::xml_node<> *objectNode)
   {
     pos = m_papplication->getUtils()->stringToVec3(objectNode->first_attribute("pos")->value());
   }
-
+  
   Camera* p_camera = new Camera(m_papplication);
   p_camera->setName(objectNode->first_attribute("name")->value());
   p_camera->setPosition(pos);
@@ -406,10 +406,18 @@ void R2::Scene::setupMeshObject(rapidxml::xml_node<> *objectNode)
 
   if (modelMeshes.size() == 1)
   {
+    bool hasPhysics = false;
+
+    if (objectNode->first_attribute("hasPhysics") != nullptr)
+    {
+      hasPhysics = m_papplication->getUtils()->stringToBool(objectNode->first_attribute("hasPhysics")->value());
+    }
+
     modelMeshes[0]->setName(objectNode->first_attribute("name")->value());
     modelMeshes[0]->setPosition(pos);
     modelMeshes[0]->setRotation(rot);
     modelMeshes[0]->setScale(scl);
+    modelMeshes[0]->setHasPhysics(hasPhysics);
     addMesh(modelMeshes[0]);
   }
   else
@@ -516,4 +524,24 @@ void R2::Scene::setupBillboardObject(rapidxml::xml_node<>* objectNode)
   p_billboard->setScale(scl);
   p_billboard->setup();
   addMesh(p_billboard);
+}
+
+glm::vec3 R2::Scene::getGravityDirection()
+{
+  return m_gravityDirection;
+}
+
+void R2::Scene::setGravityDirection(glm::vec3 gravityDirection)
+{
+  m_gravityDirection = gravityDirection;
+}
+
+void R2::Scene::setGravityForce(float gravity)
+{
+  m_gravityForce = gravity;
+}
+
+float R2::Scene::getGravityForce()
+{
+  return m_gravityForce;
 }
