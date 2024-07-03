@@ -11,7 +11,7 @@ std::string R2::Utils::getCurrentPath()
   char *path = NULL;
   int length, dirname_length;
   int i;
-
+  
   length = wai_getExecutablePath(NULL, 0, &dirname_length);
   if (length > 0)
   {

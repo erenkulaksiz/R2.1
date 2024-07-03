@@ -156,49 +156,68 @@ glm::vec3 R2::Light::getDirection() const
   return m_direction;
 }
 
-void R2::Light::updateShadowMap(Shader *p_shader, Camera *p_camera)
+void R2::Light::updateDirectionalShadowMap(Shader *p_shader, Camera *p_camera)
 {
-  if (!p_shader)
+  glm::vec3 min = glm::vec3(FLT_MAX, FLT_MAX, FLT_MAX);
+  glm::vec3 max = glm::vec3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+  std::vector<Mesh*> meshes = m_papplication->getSceneManager()->getCurrentScene()->getMeshes();
+  for (Mesh* p_mesh : meshes)
   {
-    std::cout << "R2::Light::updateShadowMap() - Shader is not valid" << std::endl;
-    return;
+    if (p_mesh->getIsCamera() || p_mesh->getIsBillboard())
+      continue;
+
+    if (p_mesh->getIsVisible())
+    {
+      glm::vec3 meshMin = p_mesh->getBoundingBoxMin();
+      glm::vec3 meshMax = p_mesh->getBoundingBoxMax();
+
+      if (meshMin.x < min.x) min.x = meshMin.x;
+      if (meshMin.y < min.y) min.y = meshMin.y;
+      if (meshMin.z < min.z) min.z = meshMin.z;
+
+      if (meshMax.x > max.x) max.x = meshMax.x;
+      if (meshMax.y > max.y) max.y = meshMax.y;
+      if (meshMax.z > max.z) max.z = meshMax.z;
+    }
   }
-  
-  if (m_isDirectionalLight)
-  {
-    m_lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 30.0f);
-    m_lightView = glm::lookAt(m_position, m_position + m_direction, glm::vec3(0.0f, 1.0f, 0.0f));
-    m_lightSpaceMatrix = m_lightProjection * m_lightView;
 
-    glViewport(0, 0, m_shadowWidth, m_shadowHeight);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+  glm::vec3 center = (min + max) * 0.5f;
 
-    glClear(GL_DEPTH_BUFFER_BIT);
+  m_lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, m_nearPlane, m_farPlane);
 
-    m_papplication->getRenderer()->renderShadowMap(p_shader, m_papplication->getSceneManager()->getCurrentScene(), m_lightSpaceMatrix);
-    
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  }
-  else if (m_isPointLight)
-  {
-    m_lightProjection = glm::perspective(glm::radians(90.0f), (float)m_shadowWidth / (float)m_shadowHeight, m_nearPlane, m_farPlane);
-    m_lightSpaceMatrices.clear();
-    m_lightSpaceMatrices.push_back(m_lightProjection * glm::lookAt(m_position, m_position + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-    m_lightSpaceMatrices.push_back(m_lightProjection * glm::lookAt(m_position, m_position + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-    m_lightSpaceMatrices.push_back(m_lightProjection * glm::lookAt(m_position, m_position + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
-    m_lightSpaceMatrices.push_back(m_lightProjection * glm::lookAt(m_position, m_position + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
-    m_lightSpaceMatrices.push_back(m_lightProjection * glm::lookAt(m_position, m_position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-    m_lightSpaceMatrices.push_back(m_lightProjection * glm::lookAt(m_position, m_position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+  m_lightView = glm::lookAt(m_position, m_position + m_direction, glm::vec3(0.0f, 1.0f, 0.0f));
+  m_lightSpaceMatrix = m_lightProjection * m_lightView;
 
-    glViewport(0, 0, m_shadowWidth, m_shadowHeight);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+  glViewport(0, 0, m_shadowWidth, m_shadowHeight);
+  glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
 
-    glClear(GL_DEPTH_BUFFER_BIT);
+  glClear(GL_DEPTH_BUFFER_BIT);
 
-    m_papplication->getRenderer()->renderShadowMap(p_shader, m_papplication->getSceneManager()->getCurrentScene(), m_lightSpaceMatrices, m_position, m_farPlane);
+  m_papplication->getRenderer()->renderDirectionalShadowMap(p_shader, m_papplication->getSceneManager()->getCurrentScene(), m_lightSpaceMatrix);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  }
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void R2::Light::updatePointShadowMap(Shader* p_shader, Camera* p_camera, int lightIndex)
+{
+  m_lightProjection = glm::perspective(glm::radians(90.0f), (float)m_shadowWidth / (float)m_shadowHeight, m_nearPlane, m_farPlane);
+  m_lightSpaceMatrices.clear();
+  m_lightSpaceMatrices.push_back(m_lightProjection * glm::lookAt(m_position, m_position + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+  m_lightSpaceMatrices.push_back(m_lightProjection * glm::lookAt(m_position, m_position + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+  m_lightSpaceMatrices.push_back(m_lightProjection * glm::lookAt(m_position, m_position + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+  m_lightSpaceMatrices.push_back(m_lightProjection * glm::lookAt(m_position, m_position + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
+  m_lightSpaceMatrices.push_back(m_lightProjection * glm::lookAt(m_position, m_position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+  m_lightSpaceMatrices.push_back(m_lightProjection * glm::lookAt(m_position, m_position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+
+  glViewport(0, 0, m_shadowWidth, m_shadowHeight);
+  glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+
+  glClear(GL_DEPTH_BUFFER_BIT);
+
+  m_papplication->getRenderer()->renderPointShadowMap(p_shader, m_papplication->getSceneManager()->getCurrentScene(), m_lightSpaceMatrices, m_position, m_farPlane);
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 glm::mat4 R2::Light::getLightSpaceMatrix() const
@@ -249,4 +268,9 @@ float R2::Light::getFarPlane() const
 GLuint R2::Light::getDepthMapFBO() const
 {
   return m_depthMapFBO;
+}
+
+GLuint R2::Light::getDepthCubemap() const
+{
+  return m_depthCubemap;
 }

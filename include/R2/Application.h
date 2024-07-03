@@ -43,10 +43,7 @@ namespace R2
     bool getIsMouseVisible();
     unsigned int getScreenWidth();
     unsigned int getScreenHeight();
-    Shader *getDirectionalDepthShader();
-    Shader *getPointDepthShader();
-    Shader *getBoundingBoxShader();
-    Shader *getDefaultObjectShader();
+    int getFrameCount();
 
   private:
     GLFWwindow *m_pwindow;
@@ -69,10 +66,7 @@ namespace R2
     float m_deltaTime;
     float m_currentFrame;
     float m_previousFrame;
-    Shader *m_pdirectionalDepthShader;
-    Shader *m_ppointDepthShader;
-    Shader *m_pboundingBoxShader;
-    Shader *m_defaultObjectShader;
+    int m_frameCount = 0;
   };
 }
 

@@ -91,19 +91,19 @@ std::vector<R2::Mesh *> R2::MeshGroup::getChildMeshes()
   return m_meshes;
 }
 
-void R2::MeshGroup::renderShadowMap(Shader *p_shader, glm::mat4 lightSpaceMatrix)
+void R2::MeshGroup::renderDirectionalShadowMap(Shader *p_shader, glm::mat4 lightSpaceMatrix)
 {
   for (size_t i = 0; i < m_meshes.size(); i++)
   {
-    m_meshes[i]->renderShadowMap(p_shader, lightSpaceMatrix);
+    m_meshes[i]->renderDirectionalShadowMap(p_shader, lightSpaceMatrix);
   }
 }
 
-void R2::MeshGroup::renderShadowMap(Shader *p_shader, std::vector<glm::mat4> lightSpaceMatrix, glm::vec3 lightPos, float farPlane)
+void R2::MeshGroup::renderPointShadowMap(Shader *p_shader, std::vector<glm::mat4> lightSpaceMatrix, glm::vec3 lightPos, float farPlane)
 {
   for (size_t i = 0; i < m_meshes.size(); i++)
   {
-    m_meshes[i]->renderShadowMap(p_shader, lightSpaceMatrix, lightPos, farPlane);
+    m_meshes[i]->renderPointShadowMap(p_shader, lightSpaceMatrix, lightPos, farPlane);
   }
 }
 

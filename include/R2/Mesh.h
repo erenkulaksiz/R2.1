@@ -46,11 +46,10 @@ namespace R2
     void setShader(Shader *p_shader);
     void setIsLine(bool isLine);
     virtual void render(Camera *p_camera, Scene *p_scene);
-    virtual void render(Camera *p_camera, Scene *p_scene, Shader *p_shader);
     // Directional Light
-    virtual void renderShadowMap(Shader *p_shader, glm::mat4 lightSpaceMatrix);
+    virtual void renderDirectionalShadowMap(Shader *p_shader, glm::mat4 lightSpaceMatrix);
     // Point Light
-    virtual void renderShadowMap(Shader *p_shader, std::vector<glm::mat4> lightSpaceMatrix, glm::vec3 lightPos, float farPlane);
+    virtual void renderPointShadowMap(Shader *p_shader, std::vector<glm::mat4> lightSpaceMatrix, glm::vec3 lightPos, float farPlane);
     virtual void setIsVisible(bool isVisible);
     bool getIsVisible();
     void setColor(glm::vec4 color);
@@ -79,7 +78,7 @@ namespace R2
     void setBoundingBox(glm::vec3 min, glm::vec3 max);
     virtual void drawBoundingBox(Scene* p_scene);
     void applyForce(glm::vec3 force);
-    void updatePhysics(float deltaTime, glm::vec3 gravity);
+    void updatePhysics(float deltaTime, glm::vec3 gravity, std::vector<Mesh *> p_meshes);
     void setMass(float mass);
     float getMass();
     void setIsAffectedByGravity(bool isAffectedByGravity);
@@ -88,6 +87,10 @@ namespace R2
     bool getHasPhysics();
     glm::vec3 getVelocity();
     void setVelocity(glm::vec3 velocity);
+    bool isColliding(Mesh *p_mesh);
+    void setIsStatic(bool isStatic);
+    bool getIsStatic();
+    glm::vec3 calculatePenetration(Mesh *p_mesh);
 
   protected:
     Shader *m_pshader;
@@ -101,6 +104,7 @@ namespace R2
     float m_mass = 0.0f;
     bool m_isAffectedByGravity = true;
     bool m_hasPhysics = false;
+    bool m_isStatic = false;
     VAO *m_pvao;
     VBO *m_pvbo;
     EBO *m_pebo;
@@ -121,7 +125,6 @@ namespace R2
     bool m_isDrawingBoundingBox = false;
     std::string m_name;
     void setShaderLightValues(std::vector<Light *> p_lights, std::string lightType);
-    void setShaderLightValues(std::vector<Light *> p_lights, std::string lightType, Shader *p_shader);
     glm::vec3 m_boundingBoxMin = glm::vec3(0.0f);
     glm::vec3 m_boundingBoxMax = glm::vec3(0.0f);
     bool m_boundingBoxInitialized = false;

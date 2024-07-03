@@ -242,6 +242,12 @@ void R2::Imgui::renderMeshPhysics(Mesh* p_mesh)
     {
       p_mesh->setIsAffectedByGravity(isAffectedByGravity);
     }
+
+    bool isStatic = p_mesh->getIsStatic();
+    if (ImGui::Checkbox("static", &isStatic))
+    {
+      p_mesh->setIsStatic(isStatic);
+    }
   }
 }
 
@@ -474,6 +480,16 @@ void R2::Imgui::renderLightSettings(Light *p_light)
         if (ImGui::DragFloat3("direction", direction, 0.01f, -1000.0f, 1000.0f, "%.1f"))
         {
           p_light->setDirection(glm::vec3(direction[0], direction[1], direction[2]));
+        }
+        float nearPlane = p_light->getNearPlane();
+        if (ImGui::DragFloat("near plane", &nearPlane, 0.1f, 0.0f, 500.0f))
+        {
+          p_light->setNearPlane(nearPlane);
+        }
+        float farPlane = p_light->getFarPlane();
+        if (ImGui::DragFloat("far plane", &farPlane, 0.1f, 0.0f, 500.0f))
+        {
+          p_light->setFarPlane(farPlane);
         }
       }
 

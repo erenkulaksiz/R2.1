@@ -37,6 +37,8 @@ namespace R2
     void setPosition(glm::vec3 position) override;
     void setRotation(glm::vec3 rotation) override;
     void setScale(glm::vec3 scale) override;
+    glm::vec3 getDirection();
+    glm::vec3 getUp();
 
   private:
     Application *m_papplication;
@@ -44,6 +46,7 @@ namespace R2
     glm::mat4 m_projection;
     glm::vec3 m_cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 m_cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 m_direction = glm::vec3(0.0f, 0.0f, 0.0f);
     float m_fov = 80.0f;
     float m_yaw = 0.0f;
     float m_pitch = 0.0f;

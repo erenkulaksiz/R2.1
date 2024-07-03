@@ -172,12 +172,11 @@ void R2::Camera::loop()
     if (m_yaw < 0.0f)
       m_yaw = 360.0f;
 
-    glm::vec3 direction;
-    direction.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-    direction.y = sin(glm::radians(m_pitch));
-    direction.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+    m_direction.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+    m_direction.y = sin(glm::radians(m_pitch));
+    m_direction.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
 
-    m_cameraFront = glm::normalize(direction);
+    m_cameraFront = glm::normalize(m_direction);
     m_rotation = glm::vec3(m_pitch, m_yaw, 0);
   }
 
@@ -286,4 +285,14 @@ void R2::Camera::setScale(glm::vec3 scale)
 {
   m_scale = scale;
   updateMatrix();
+}
+
+glm::vec3 R2::Camera::getDirection()
+{
+  return m_cameraFront;
+}
+
+glm::vec3 R2::Camera::getUp()
+{
+  return m_cameraUp;
 }

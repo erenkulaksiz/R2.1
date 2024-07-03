@@ -66,18 +66,6 @@ bool R2::Application::setup()
   m_pinput = new Input(this);
   m_pconfig = new Config(this);
 
-  m_pdirectionalDepthShader = new Shader(m_putils->getFilePath("/shaders/shadow/shadow.vert"), m_putils->getFilePath("/shaders/shadow/shadow.frag"));
-  m_pdirectionalDepthShader->setup(this);
-
-  m_ppointDepthShader = new Shader(m_putils->getFilePath("/shaders/pointShadow/pointShadow.vert"), m_putils->getFilePath("/shaders/pointShadow/pointShadow.frag"), m_putils->getFilePath("/shaders/pointShadow/pointShadow.geom"));
-  m_ppointDepthShader->setup(this);
-
-  m_pboundingBoxShader = new Shader(m_putils->getFilePath("/shaders/line/line.vert"), m_putils->getFilePath("/shaders/line/line.frag"));
-  m_pboundingBoxShader->setup(this);
-
-  m_defaultObjectShader = new Shader(m_putils->getFilePath("/shaders/default/default.vert"), m_putils->getFilePath("/shaders/default/default.frag"));
-  m_defaultObjectShader->setup(this);
-
   m_psceneManager = new SceneManager(this);
   m_psceneManager->loadScenes();
 
@@ -136,6 +124,7 @@ void R2::Application::loop()
   m_deltaTime = m_currentFrame - m_previousFrame;
   m_previousFrame = m_currentFrame;
   m_fps = 1.0f / m_deltaTime;
+  m_frameCount += 1;
 
   if (m_isVsyncEnabled)
   {
@@ -259,22 +248,7 @@ unsigned int R2::Application::getScreenHeight()
   return m_screenHeight;
 }
 
-R2::Shader *R2::Application::getDirectionalDepthShader()
+int R2::Application::getFrameCount()
 {
-  return m_pdirectionalDepthShader;
-}
-
-R2::Shader *R2::Application::getPointDepthShader()
-{
-  return m_ppointDepthShader;
-}
-
-R2::Shader *R2::Application::getBoundingBoxShader()
-{
-  return m_pboundingBoxShader;
-}
-
-R2::Shader *R2::Application::getDefaultObjectShader()
-{
-  return m_defaultObjectShader;
+  return m_frameCount;
 }

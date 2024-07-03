@@ -42,6 +42,12 @@
       <light name="BluePointLight" pos="10,5,4" type="point" color="0,1,0,1" intensity="2" />
       <camera name="MainCamera" pos="-9.5,9.3,1.6" rot="-44.5,349.6,0" isMain="true" />
     </scene>
+    <scene name="TerrainTest">
+      <mesh name="Terrain" file="/resources/terrain.obj" pos="0,0,0" shader="default" />
+      <mesh name="TestCube" file="/resources/testcube.obj" pos="0,30,0" rot="60,60,60" shader="default" />
+      <light name="DirectionalLight" pos="0,100,0" type="directional" color="1,1,1,1" intensity="1" dir="0,-1,0" />
+      <camera name="MainCamera" pos="-18.8,37.6,10.5" rot="-36.9,329.4,0" isMain="true" far="500" />
+    </scene>
 	</scenes>
 	<config>
 		<item name="width" value="920" />

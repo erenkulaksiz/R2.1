@@ -105,16 +105,28 @@ void R2::Scene::loop()
 
   if (m_isSetup)
   {
-    for (Light *p_directionalLights : m_directionalLights)
+    if (m_papplication->getFrameCount() % 4 == 0)
     {
-      p_directionalLights->updateShadowMap(m_papplication->getDirectionalDepthShader(), m_pcamera);
-    }
-    for (Light *p_pointLight : m_pointLights)
-    {
-      p_pointLight->updateShadowMap(m_papplication->getPointDepthShader(), m_pcamera);
+      for (Light* p_directionalLights : m_directionalLights)
+      {
+        p_directionalLights->updateDirectionalShadowMap(m_papplication->getRenderer()->getDirectionalDepthShader(), m_pcamera);
+      }
+
+      for (int i = 0; i < m_pointLights.size(); ++i)
+      {
+        float distance = glm::length(m_pcamera->getPosition() - m_pointLights[i]->getPosition());
+
+        if (distance > (m_pointLights[i]->getFarPlane() / 2))
+        {
+          continue;
+        }
+
+        m_pointLights[i]->updatePointShadowMap(m_papplication->getRenderer()->getPointDepthShader(), m_pcamera, i);
+      }
     }
 
     glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_papplication->getRenderer()->render(m_pcamera, this);
   }
@@ -136,7 +148,7 @@ R2::Mesh *R2::Scene::lineMesh(glm::vec3 start, glm::vec3 end, glm::vec4 color)
   unsigned int lineIndices[2] = {
       0, 1};
 
-  Mesh *p_lineMesh = new Mesh(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), m_papplication->getBoundingBoxShader());
+  Mesh *p_lineMesh = new Mesh(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), m_papplication->getRenderer()->getBoundingBoxShader());
   p_lineMesh->setName("LineMesh");
   p_lineMesh->setIsLine(true);
   p_lineMesh->setVertices(lineVertices, sizeof(lineVertices));
@@ -166,6 +178,7 @@ void R2::Scene::cleanup()
 std::vector<R2::Camera *> R2::Scene::getCameras()
 {
   std::vector<Camera *> cameras;
+
   for (Mesh *mesh : m_meshes)
   {
     if (mesh->getIsCamera())
@@ -173,6 +186,7 @@ std::vector<R2::Camera *> R2::Scene::getCameras()
       cameras.push_back((Camera *)mesh);
     }
   }
+
   return cameras;
 }
 
@@ -214,7 +228,7 @@ void R2::Scene::addGridMesh()
     indices.push_back(static_cast<unsigned int>(i));
   }
 
-  Mesh *p_gridMesh = new Mesh(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f), m_papplication->getBoundingBoxShader());
+  Mesh *p_gridMesh = new Mesh(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f), m_papplication->getRenderer()->getBoundingBoxShader());
   p_gridMesh->setName("GridMesh");
   p_gridMesh->setIsLine(true);
   p_gridMesh->setVertices(vertices.data(), vertices.size() * sizeof(float));
@@ -374,6 +388,11 @@ void R2::Scene::setupCameraObject(rapidxml::xml_node<> *objectNode)
   p_camera->setPosition(pos);
   p_camera->setRotation(rot);
   p_camera->setScale(scl);
+  
+  if (objectNode->first_attribute("far") != nullptr)
+  {
+    p_camera->setFar(m_papplication->getUtils()->stringToFloat(objectNode->first_attribute("far")->value()));
+  }
 
   if (objectNode->first_attribute("isMain") != nullptr)
   {
@@ -399,7 +418,7 @@ void R2::Scene::setupMeshObject(rapidxml::xml_node<> *objectNode)
     if (std::string(type) == std::string("default"))
     {
       std::cout << "Default shader" << std::endl;
-      p_objectShader = m_papplication->getDefaultObjectShader();
+      p_objectShader = m_papplication->getRenderer()->getDefaultObjectShader();
     }
   }
 

@@ -4,9 +4,9 @@ in vec3 FragPos;
 in vec2 TexCoord;
 in vec3 Normal;
 in vec4 FragPosLightSpace;
-in vec3 Tangent;
-in vec3 Bitangent;
-in mat3 TBN;
+//in vec3 Tangent;
+//in vec3 Bitangent;
+//in mat3 TBN;
 
 struct Material {
   sampler2D diffuse;
@@ -43,7 +43,7 @@ struct DirectionalLight {
 };
 
 #define MAX_POINT_LIGHTS 5
-#define MAX_DIRECTIONAL_LIGHTS 5
+#define MAX_DIRECTIONAL_LIGHTS 1
 
 uniform int numberOfPointLights;
 uniform int numberOfDirectionalLights;
@@ -52,6 +52,15 @@ uniform bool lightsEnabled;
 uniform Material material;
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
 uniform DirectionalLight directionalLights[MAX_DIRECTIONAL_LIGHTS];
+
+vec3 sampleOffsetDirections[20] = vec3[]
+(
+   vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+   vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+);
 
 float DirectLightShadowCalculation(vec4 fragPosLightSpace, sampler2D shadowMap) {
   vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -78,26 +87,19 @@ float DirectLightShadowCalculation(vec4 fragPosLightSpace, sampler2D shadowMap) 
 float PointLightShadowCalculation(PointLight light, vec3 fragPos) {
     vec3 fragToLight = fragPos - light.position;
     float currentDepth = length(fragToLight);
-    vec3 lightSpaceCoords = normalize(fragToLight);
-
-    float bias = 0.05;
     float shadow = 0.0;
-    float samples = 0.0;
-
-    int sampleSize = 2;
-    for (int x = -sampleSize; x <= sampleSize; ++x) {
-        for (int y = -sampleSize; y <= sampleSize; ++y) {
-            for (int z = -sampleSize; z <= sampleSize; ++z) {
-                vec3 offset = vec3(x, y, z) * 0.1;
-                float closestDepth = texture(light.shadowMap, lightSpaceCoords + offset).r;
-                closestDepth *= light.farPlane;
-                shadow += (currentDepth - bias > closestDepth) ? 1.0 : 0.0;
-                samples++;
-            }
-        }
+    float bias   = 0.4;
+    int samples  = 10;
+    float diskRadius = (1.0 + (currentDepth / light.farPlane)) / 25.0;
+    for(int i = 0; i < samples; ++i)
+    {
+        float closestDepth = texture(light.shadowMap, fragToLight + sampleOffsetDirections[i] * diskRadius).r;
+        closestDepth *= light.farPlane;
+        if(currentDepth - bias > closestDepth)
+            shadow += 1.0;
     }
-    shadow /= samples;
-    
+    shadow /= float(samples);  
+
     return shadow;
 }
 
@@ -141,7 +143,7 @@ vec3 CalcDirectionalLight(DirectionalLight light, vec3 normal, vec3 fragPos, vec
 
   diffuse *= (1.0 - shadow);
   specular *= (1.0 - shadow);
-  
+
   ambient *= light.color.rgb * light.intensity * vec3(texture(material.diffuse, TexCoord));
   diffuse *= light.color.rgb * light.intensity * vec3(texture(material.diffuse, TexCoord));
   specular *= light.color.rgb * light.intensity * vec3(texture(material.specular, TexCoord));

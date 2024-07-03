@@ -7,6 +7,7 @@
 #include <R2/Camera.h>
 #include <R2/Light.h>
 #include <R2/MeshGroup.h>
+#include <R2/Renderer.h>
 
 R2::Mesh::Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, float* p_vertices, unsigned int* p_indices, size_t vertexCount, size_t indexCount, Shader* p_shader)
 {
@@ -188,11 +189,11 @@ void R2::Mesh::render(Camera* p_camera, Scene* p_scene)
   m_pshader->setMat4("projection", p_camera->getProjectionMatrix());
   m_pshader->setVec4("color", m_color);
   m_pshader->setVec3("camPos", p_camera->getPosition());
-
+  
   for (size_t i = 0; i < m_ptextures.size(); i++)
   {
     m_ptextures[i]->bind();
-
+    
     if (m_ptextures[i]->getShininess())
     {
       m_pshader->setFloat("material.shininess", m_ptextures[i]->getShininess());
@@ -218,69 +219,7 @@ void R2::Mesh::render(Camera* p_camera, Scene* p_scene)
   glDrawElements(m_isLine ? GL_LINES : GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
 }
 
-void R2::Mesh::render(Camera* p_camera, Scene* p_scene, Shader* p_shader)
-{
-  if (m_isCamera || !m_isVisible)
-  {
-    return;
-  }
-
-  if (m_isDrawingBoundingBox)
-  {
-    drawBoundingBox(p_scene);
-  }
-
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  glDepthFunc(GL_LESS);
-  glEnable(GL_DEPTH_TEST);
-  glViewport(0, 0, p_scene->getApplication()->getScreenWidth(), p_scene->getApplication()->getScreenHeight());
-
-  m_pvao->bind();
-  p_shader->activate();
-
-  glm::mat4 model = glm::mat4(1.0f);
-  model = glm::translate(model, m_position);
-  model = glm::rotate(model, glm::radians(m_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-  model = glm::rotate(model, glm::radians(m_rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-  model = glm::rotate(model, glm::radians(m_rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-  model = glm::scale(model, m_scale);
-
-  p_shader->setMat4("model", model);
-  p_shader->setMat4("view", p_camera->getViewMatrix());
-  p_shader->setMat4("projection", p_camera->getProjectionMatrix());
-  p_shader->setVec4("color", m_color);
-  p_shader->setVec3("camPos", p_camera->getPosition());
-
-  for (size_t i = 0; i < m_ptextures.size(); i++)
-  {
-    m_ptextures[i]->bind();
-
-    if (m_ptextures[i]->getShininess())
-    {
-      m_pshader->setFloat("material.shininess", m_ptextures[i]->getShininess());
-    }
-  }
-
-  if (m_isBillboard)
-  {
-    p_shader->setVec3("billboardPos", m_position);
-  }
-
-  if (!m_isLight && !m_isBillboard)
-  {
-    p_shader->setBool("lightsEnabled", p_scene->getIsLightsActive());
-
-    setShaderLightValues(p_scene->getPointLights(), "pointLights", p_shader);
-    setShaderLightValues(p_scene->getDirectionalLights(), "directionalLights", p_shader);
-
-    p_shader->setInt("numberOfPointLights", p_scene->getPointLights().size());
-    p_shader->setInt("numberOfDirectionalLights", p_scene->getDirectionalLights().size());
-  }
-
-  glDrawElements(m_isLine ? GL_LINES : GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
-}
-
-void R2::Mesh::renderShadowMap(Shader* p_shader, glm::mat4 lightSpaceMatrix)
+void R2::Mesh::renderDirectionalShadowMap(Shader* p_shader, glm::mat4 lightSpaceMatrix)
 {
   if (m_isCamera || !m_isVisible || m_isLight || m_isLine || m_isBillboard)
     return;
@@ -301,7 +240,7 @@ void R2::Mesh::renderShadowMap(Shader* p_shader, glm::mat4 lightSpaceMatrix)
   glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
 }
 
-void R2::Mesh::renderShadowMap(Shader* p_shader, std::vector<glm::mat4> lightSpaceMatrix, glm::vec3 lightPos, float farPlane)
+void R2::Mesh::renderPointShadowMap(Shader* p_shader, std::vector<glm::mat4> lightSpaceMatrix, glm::vec3 lightPos, float farPlane)
 {
   if (m_isCamera || !m_isVisible || m_isLight || m_isLine || m_isBillboard)
     return;
@@ -499,50 +438,6 @@ void R2::Mesh::setShaderLightValues(std::vector<Light*> p_lights, std::string li
   }
 }
 
-void R2::Mesh::setShaderLightValues(std::vector<Light*> p_lights, std::string lightType, Shader* p_shader)
-{
-  for (int i = 0; i < p_lights.size(); i++)
-  {
-    if (!p_lights[i]->getIsVisible())
-    {
-      p_shader->setBool(lightType + "[" + std::to_string(i) + "].enabled", false);
-      continue;
-    }
-
-    p_shader->setBool(lightType + "[" + std::to_string(i) + "].enabled", true);
-    p_shader->setVec3(lightType + "[" + std::to_string(i) + "].position", p_lights[i]->getPosition());
-    p_shader->setVec4(lightType + "[" + std::to_string(i) + "].color", p_lights[i]->getColor());
-    p_shader->setFloat(lightType + "[" + std::to_string(i) + "].intensity", p_lights[i]->getIntensity());
-    p_shader->setFloat(lightType + "[" + std::to_string(i) + "].constant", p_lights[i]->getConstant());
-    p_shader->setFloat(lightType + "[" + std::to_string(i) + "].linear", p_lights[i]->getLinear());
-    p_shader->setFloat(lightType + "[" + std::to_string(i) + "].quadratic", p_lights[i]->getQuadratic());
-    p_shader->setVec3(lightType + "[" + std::to_string(i) + "].specular", p_lights[i]->getSpecular());
-    p_shader->setVec3(lightType + "[" + std::to_string(i) + "].diffuse", p_lights[i]->getDiffuse());
-    p_shader->setVec3(lightType + "[" + std::to_string(i) + "].ambient", p_lights[i]->getAmbient());
-
-    if (p_lights[i]->getIsDirectionalLight())
-    {
-      glActiveTexture(GL_TEXTURE16);
-      GLuint depthMapTexture = p_lights[i]->getDepthMap();
-      glBindTexture(GL_TEXTURE_2D, depthMapTexture);
-
-      p_shader->setVec3(lightType + "[" + std::to_string(i) + "].direction", p_lights[i]->getDirection());
-      p_shader->setMat4(lightType + "[" + std::to_string(i) + "].lightSpaceMatrix", p_lights[i]->getLightSpaceMatrix());
-      p_shader->setInt(lightType + "[" + std::to_string(i) + "].shadowMap", 16);
-    }
-
-    if (p_lights[i]->getIsPointLight())
-    {
-      glActiveTexture(GL_TEXTURE17 + i);
-      GLuint depthMapTexture = p_lights[i]->getDepthMap();
-      glBindTexture(GL_TEXTURE_CUBE_MAP, depthMapTexture);
-
-      p_shader->setFloat(lightType + "[" + std::to_string(i) + "].farPlane", p_lights[i]->getFarPlane());
-      p_shader->setInt(lightType + "[" + std::to_string(i) + "].shadowMap", i + 17);
-    }
-  }
-}
-
 glm::vec3 R2::Mesh::getBoundingBoxMin()
 {
   return m_boundingBoxMin;
@@ -617,7 +512,7 @@ void R2::Mesh::drawBoundingBox(Scene *p_scene)
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
 
-  Shader* p_shader = p_scene->getApplication()->getBoundingBoxShader();
+  Shader* p_shader = p_scene->getApplication()->getRenderer()->getBoundingBoxShader();
   p_shader->activate();
   p_shader->setMat4("model", model);
   p_shader->setMat4("view", p_scene->getCamera()->getViewMatrix());
@@ -651,9 +546,9 @@ void R2::Mesh::applyForce(glm::vec3 force)
   m_acceleration += force / m_mass;
 }
 
-void R2::Mesh::updatePhysics(float deltaTime, glm::vec3 gravity)
+void R2::Mesh::updatePhysics(float deltaTime, glm::vec3 gravity, std::vector<Mesh *> p_meshes)
 {
-  if(!m_hasPhysics)
+  if(!m_hasPhysics || m_isStatic)
   {
     return;
   }
@@ -663,6 +558,42 @@ void R2::Mesh::updatePhysics(float deltaTime, glm::vec3 gravity)
   }
   m_velocity += m_acceleration * deltaTime;
   m_position += m_velocity * deltaTime;
+
+  for(Mesh *mesh : p_meshes)
+  {
+    if (mesh == this)
+    {
+      continue;
+    }
+
+    if (mesh->getHasPhysics())
+    {
+      if(isColliding(mesh))
+      {
+        if (mesh->getIsStatic())
+        {
+          glm::vec3 penetration = calculatePenetration(mesh);
+
+          if (abs(penetration.x) > 0) {
+            m_velocity.x = 0;
+          }
+          if (abs(penetration.y) > 0) {
+            m_velocity.y = 0;
+          }
+          if (abs(penetration.z) > 0) {
+            m_velocity.z = 0;
+          }
+        }
+        else
+        {
+          glm::vec3 direction = glm::normalize(m_position - mesh->getPosition());
+          m_position += direction * 0.01f;
+          mesh->setPosition(mesh->getPosition() - direction * 0.01f);
+        }
+      }
+    }
+  }
+
   m_acceleration = glm::vec3(0.0f);
 }
 
@@ -704,4 +635,66 @@ glm::vec3 R2::Mesh::getVelocity()
 void R2::Mesh::setVelocity(glm::vec3 velocity)
 {
   m_velocity = velocity;
+}
+
+bool R2::Mesh::isColliding(Mesh* p_mesh)
+{
+  if (m_position.x + m_boundingBoxMax.x < p_mesh->getPosition().x + p_mesh->getBoundingBoxMin().x ||
+      m_position.x + m_boundingBoxMin.x > p_mesh->getPosition().x + p_mesh->getBoundingBoxMax().x)
+  {
+    return false;
+  }
+
+  if (m_position.y + m_boundingBoxMax.y < p_mesh->getPosition().y + p_mesh->getBoundingBoxMin().y ||
+      m_position.y + m_boundingBoxMin.y > p_mesh->getPosition().y + p_mesh->getBoundingBoxMax().y)
+  {
+    return false;
+  }
+
+  if (m_position.z + m_boundingBoxMax.z < p_mesh->getPosition().z + p_mesh->getBoundingBoxMin().z ||
+      m_position.z + m_boundingBoxMin.z > p_mesh->getPosition().z + p_mesh->getBoundingBoxMax().z)
+  {
+    return false;
+  }
+
+  return true;
+}
+
+void R2::Mesh::setIsStatic(bool isStatic)
+{
+  m_isStatic = isStatic;
+}
+
+bool R2::Mesh::getIsStatic()
+{
+  return m_isStatic;
+}
+
+glm::vec3 R2::Mesh::calculatePenetration(Mesh* p_mesh) {
+  glm::vec3 thisMin = m_position + m_boundingBoxMin;
+  glm::vec3 thisMax = m_position + m_boundingBoxMax;
+  glm::vec3 otherMin = p_mesh->getPosition() + p_mesh->getBoundingBoxMin();
+  glm::vec3 otherMax = p_mesh->getPosition() + p_mesh->getBoundingBoxMax();
+
+  glm::vec3 thisCenter = (thisMin + thisMax) / 2.0f;
+  glm::vec3 otherCenter = (otherMin + otherMax) / 2.0f;
+  glm::vec3 distance = thisCenter - otherCenter;
+
+  float xOverlap = (thisMax.x - thisMin.x) / 2.0f + (otherMax.x - otherMin.x) / 2.0f - abs(distance.x);
+  float yOverlap = (thisMax.y - thisMin.y) / 2.0f + (otherMax.y - otherMin.y) / 2.0f - abs(distance.y);
+  float zOverlap = (thisMax.z - thisMin.z) / 2.0f + (otherMax.z - otherMin.z) / 2.0f - abs(distance.z);
+
+  if (xOverlap > 0 && yOverlap > 0 && zOverlap > 0) {
+    if (xOverlap < yOverlap && xOverlap < zOverlap) {
+      return glm::vec3(distance.x < 0 ? -xOverlap : xOverlap, 0.0f, 0.0f);
+    }
+    else if (yOverlap < xOverlap && yOverlap < zOverlap) {
+      return glm::vec3(0.0f, distance.y < 0 ? -yOverlap : yOverlap, 0.0f);
+    }
+    else {
+      return glm::vec3(0.0f, 0.0f, distance.z < 0 ? -zOverlap : zOverlap);
+    }
+  }
+
+  return glm::vec3(0.0f);
 }
