@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 #include <iostream>
-#include <R2/Shader/VBO.h>
+#include <R2/shader/VBO.h>
 
 R2::VBO::VBO(GLfloat *p_vertices, GLsizeiptr size)
 {

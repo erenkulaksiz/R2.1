@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <mutex>
 #include <R2/Config.h>
 #include <R2/Application.h>
 #include <R2/Mesh.h>

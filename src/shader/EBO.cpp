@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 #include <iostream>
-#include <R2/Shader/EBO.h>
+#include <R2/shader/EBO.h>
 
 R2::EBO::EBO(GLuint *p_indices, GLsizeiptr size)
 {

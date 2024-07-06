@@ -1,5 +1,6 @@
 #define GLFW_INCLUDE_NONE
 #include <iostream>
+#include <thread>
 #include <R2/SceneManager.h>
 #include <R2/Scene.h>
 
@@ -25,7 +26,7 @@ void R2::SceneManager::setCurrentScene(Scene *p_scene)
     return;
   }
 
-  if (m_pcurrentScene->getName() == p_scene->getName())
+  if (m_pcurrentScene != nullptr && m_pcurrentScene->getName() == p_scene->getName())
   {
     std::cout << "SceneManager::setCurrentScene() m_pcurrentScene == p_scene->getName()" << std::endl;
     return;
@@ -42,6 +43,10 @@ void R2::SceneManager::setCurrentScene(Scene *p_scene)
 
   if (!m_pcurrentScene->getIsSetup() && !m_pcurrentScene->getIsStartedSetup())
   {
+    std::cout << "SceneManager::setCurrentScene() selected scene is not setup." << std::endl;
+    // std::thread setupThread(&Scene::setup, m_pcurrentScene);
+    // setupThread.detach();
+    // fix threading.
     m_pcurrentScene->setup();
   }
 }
@@ -109,23 +114,22 @@ void R2::SceneManager::cleanup()
 void R2::SceneManager::loadScenes()
 {
   std::cout << "SceneManager::loadScenes()" << std::endl;
-  std::vector<rapidxml::xml_node<>*> sceneNodes = m_papplication->getConfig()->getSceneNodes();
+  std::vector<rapidxml::xml_node<> *> sceneNodes = m_papplication->getConfig()->getSceneNodes();
 
   for (int i = 0; i < sceneNodes.size(); i++)
   {
     std::string sceneName = sceneNodes[i]->first_attribute("name")->value();
-    
+
     Scene *p_scene = new Scene(m_papplication);
     p_scene->setName(sceneName);
+    addScene(p_scene);
 
     if (sceneNodes[i]->first_attribute("isDefault") != nullptr)
     {
       p_scene->setIsActiveScene(true);
+      setCurrentScene(p_scene);
     }
-
-    addScene(p_scene);
   }
 
   std::cout << "SceneManager::loadScenes() " << m_pscenes.size() << " scenes loaded" << std::endl;
-  setCurrentScene(0);
 }

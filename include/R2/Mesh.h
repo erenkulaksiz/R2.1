@@ -93,7 +93,7 @@ namespace R2
     glm::vec3 calculatePenetration(Mesh *p_mesh);
 
   protected:
-    Shader *m_pshader;
+    Shader* m_pshader = nullptr;
     std::vector<Texture *> m_ptextures;
     glm::vec3 m_position = glm::vec3(0.0f);
     glm::vec3 m_rotation = glm::vec3(0.0f);
@@ -105,9 +105,9 @@ namespace R2
     bool m_isAffectedByGravity = true;
     bool m_hasPhysics = false;
     bool m_isStatic = false;
-    VAO *m_pvao;
-    VBO *m_pvbo;
-    EBO *m_pebo;
+    VAO* m_pvao = nullptr;
+    VBO* m_pvbo = nullptr;
+    EBO* m_pebo = nullptr;
     bool m_setupBoundingBox = false;
     float *m_pvertices;
     unsigned int *m_pindices;

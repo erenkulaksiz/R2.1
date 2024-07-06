@@ -296,3 +296,23 @@ glm::vec3 R2::Camera::getUp()
 {
   return m_cameraUp;
 }
+
+void R2::Camera::setSpeed(float speed)
+{
+  m_speed = speed;
+}
+
+void R2::Camera::setSensitivity(float sensitivity)
+{
+  m_sensitivity = sensitivity;
+}
+
+float R2::Camera::getSpeed()
+{
+  return m_speed;
+}
+
+float R2::Camera::getSensitivity()
+{
+  return m_sensitivity;
+}

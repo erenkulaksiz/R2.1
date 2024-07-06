@@ -334,9 +334,17 @@ void R2::Mesh::cleanup()
   if (m_isCamera || m_isGroup || m_isLight)
     return;
 
-  delete m_pvao;
-  delete m_pvbo;
-  delete m_pebo;
+  if (m_pshader != nullptr)
+  {
+    //delete m_pshader;
+  }
+
+  if (m_pvao != nullptr)
+  {
+    delete m_pvao;
+    delete m_pvbo;
+    delete m_pebo;
+  }
 
   for (size_t i = 0; i < m_ptextures.size(); i++)
   {

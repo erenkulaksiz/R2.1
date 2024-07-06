@@ -39,10 +39,12 @@ bool R2::Application::setup()
   glfwMakeContextCurrent(m_pwindow);
   glfwShowWindow(m_pwindow);
 
+  m_psharedWindow = glfwCreateWindow(1, 1, p_mtitle, NULL, m_pwindow);
+
   if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress))
   {
-	std::cout << "Failed to initialize GLAD" << std::endl;
-	return false;
+	  std::cout << "Failed to initialize GLAD" << std::endl;
+	  return false;
   }
 
   glfwSetWindowUserPointer(m_pwindow, this);
@@ -251,4 +253,9 @@ unsigned int R2::Application::getScreenHeight()
 int R2::Application::getFrameCount()
 {
   return m_frameCount;
+}
+
+GLFWwindow *R2::Application::getSharedWindow()
+{
+  return m_psharedWindow;
 }

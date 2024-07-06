@@ -3,6 +3,8 @@
 #define MODEL_H
 #include <string>
 #include <vector>
+#include <tuple>
+#include <assimp/scene.h>
 #include <R2/Mesh.h>
 #include <R2/Application.h>
 #include <R2/shader/Shader.h>

@@ -165,5 +165,9 @@ GLuint R2::Shader::getId()
 void R2::Shader::cleanup()
 {
   std::cout << "Shader::cleanup()" << m_ID << std::endl;
+  if (m_ID == -1) {
+    std::cout << "Shader::cleanup() m_ID is -1" << std::endl;
+    return;
+  }
   glDeleteProgram(m_ID);
 }

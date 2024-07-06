@@ -110,7 +110,13 @@ void R2::Imgui::drawGui()
   ImGui::SetNextWindowPos(ImVec2(0, 0));
   ImGui::Begin("application");
 
-  // ImGui::ShowMetricsWindow();
+  bool isSettingUpCurrentScene = m_papplication->getSceneManager()->getCurrentScene()->getIsStartedSetup();
+  if (isSettingUpCurrentScene)
+  {
+    ImGui::Text("setting up current scene...");
+    ImGui::End();
+    return;
+  }
 
   if (ImGui::CollapsingHeader("statistics"))
   {
@@ -126,6 +132,16 @@ void R2::Imgui::drawGui()
     if (ImGui::Checkbox("vsync", &isVsyncEnabled))
     {
       m_papplication->setVsyncEnabled(isVsyncEnabled);
+    }
+
+    if (ImGui::Button("debug"))
+    {
+      m_showingImGuiDebug = !m_showingImGuiDebug;
+    }
+
+    if (m_showingImGuiDebug)
+    {
+      ImGui::ShowMetricsWindow();
     }
   }
 
@@ -344,6 +360,18 @@ void R2::Imgui::renderCameraSettings(Camera *p_camera)
       }
     }
 
+    float speed = p_camera->getSpeed();
+    if (ImGui::DragFloat("speed", &speed, 0.1f, 0.0f, 500.0f, "%.1f"))
+    {
+      p_camera->setSpeed(speed);
+    }
+
+    float sensitivity = p_camera->getSensitivity();
+    if (ImGui::DragFloat("sensitivity", &sensitivity, 0.01f, 0.0f, 500.0f, "%.01f"))
+    {
+      p_camera->setSensitivity(sensitivity);
+    }
+
     ImGui::Begin("cam view");
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
@@ -361,6 +389,8 @@ void R2::Imgui::renderCameraSettings(Camera *p_camera)
 
 void R2::Imgui::renderMeshTree(const std::vector<R2::Mesh *> &meshes)
 {
+  renderAddMesh();
+
   for (int i = 0; i < meshes.size(); i++)
   {
     Mesh *mesh = meshes[i];
@@ -618,4 +648,41 @@ void R2::Imgui::renderMeshTextures(Mesh *p_mesh)
       ImGui::Text(texture->getImagePath().data());
     }
   }
+}
+
+void R2::Imgui::renderAddMesh()
+{
+  /*
+  if (ImGui::Button("+ add"))
+    ImGui::OpenPopup("add");
+
+  if (ImGui::BeginPopup("add", ImGuiWindowFlags_None))
+  {
+    if (ImGui::Button("point light"))
+    {
+      ImGui::OpenPopup("add point light");
+    }
+
+    if(ImGui::Button("directional light"))
+      ImGui::OpenPopup("add directional light");
+
+    if(ImGui::Button("mesh"))
+      ImGui::OpenPopup("add mesh");
+
+    ImGui::EndPopup();
+  }
+
+  //ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+  //ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+  if (ImGui::BeginPopupModal("add point light", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+  {
+    ImGui::Text("All those beautiful files will be deleted.\nThis operation cannot be undone!");
+
+    if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+    ImGui::SetItemDefaultFocus();
+    ImGui::SameLine();
+    if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+    ImGui::EndPopup();
+  }*/
 }

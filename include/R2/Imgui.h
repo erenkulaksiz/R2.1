@@ -6,6 +6,12 @@
 #include <R2/Application.h>
 #include <R2/Mesh.h>
 
+enum ImguiThemes
+{
+  THEME_DARK,
+  THEME_LIGHT
+};
+
 namespace R2
 {
   class Application;
@@ -27,9 +33,11 @@ namespace R2
   private:
     Application *m_papplication;
     Mesh *m_selectedMesh = nullptr;
+    ImguiThemes m_theme = THEME_DARK;
     unsigned int m_framebuffer;
     unsigned int m_textureColorbuffer;
     unsigned int m_rbo;
+    bool m_showingImGuiDebug = false;
     void newFrame();
     void drawGui();
     void setupFramebuffer();
@@ -43,6 +51,7 @@ namespace R2
     void renderMeshPhysics(Mesh *p_mesh);
     void renderScenes(std::vector<Scene *> scenes);
     void renderMeshTextures(Mesh *p_mesh);
+    void renderAddMesh();
   };
 }
 

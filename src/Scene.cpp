@@ -97,7 +97,7 @@ void R2::Scene::loop()
     return;
   }
 
-  if (m_pcamera == nullptr)
+  if (m_pcamera == nullptr && !m_isStartedSetup)
   {
     std::cout << "Scene::loop() No camera set" << std::endl;
     return;
@@ -134,7 +134,11 @@ void R2::Scene::loop()
   {
     if (!m_isStartedSetup)
     {
+      std::cout << "Scene::loop() Scene not setup" << std::endl;
       setup();
+    }
+    else {
+      std::cout << "Scene::loop() Scene setup in progress" << std::endl;
     }
   }
 }
@@ -261,6 +265,8 @@ void R2::Scene::setup()
 {
   std::cout << "Scene::setup()" << std::endl;
 
+  glfwMakeContextCurrent(m_papplication->getSharedWindow());
+
   if (m_isStartedSetup)
   {
     std::cout << "Scene::setup() Already started setup" << std::endl;
@@ -307,6 +313,8 @@ void R2::Scene::setup()
 
   m_isSetup = true;
   m_isStartedSetup = false;
+
+  glfwMakeContextCurrent(m_papplication->getWindow());
 }
 
 void R2::Scene::reload()

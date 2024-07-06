@@ -30,6 +30,7 @@ R2::Billboard::Billboard(Application *p_application, std::string imagePath) : Me
 
   Texture *p_texture = new Texture(imagePath, GL_TEXTURE_2D, GL_TEXTURE0, GL_UNSIGNED_BYTE);
   p_texture->setup();
+  p_texture->setIsDiffuse(true);
   p_texture->texUnit(p_shader, "tex0", 0);
   addTexture(p_texture);
 }

@@ -44,9 +44,11 @@ namespace R2
     unsigned int getScreenWidth();
     unsigned int getScreenHeight();
     int getFrameCount();
+    GLFWwindow *getSharedWindow();
 
   private:
     GLFWwindow *m_pwindow;
+    GLFWwindow *m_psharedWindow;
     Imgui *m_pimgui;
     SceneManager *m_psceneManager;
     Input *m_pinput;

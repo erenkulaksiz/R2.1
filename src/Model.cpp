@@ -1,5 +1,4 @@
 #include <iostream>
-
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -18,15 +17,17 @@ std::vector<R2::Mesh *> R2::Model::loadFromFile(std::string fileName, Shader *p_
   std::cout << "Model::loadFromFile()" << std::endl;
 
   Assimp::Importer importer;
-  const aiScene *scene = importer.ReadFile(fileName, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate);
+  const aiScene* scene = importer.ReadFile(fileName, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate);
+
+  if (!scene)
+  {
+    std::cerr << "ERROR::ASSIMP::Failed to load object from file: " << fileName << std::endl;
+    return std::vector<R2::Mesh*>();
+  }
+
+  std::cout << scene->mNumMeshes << " meshes found." << std::endl;
 
   std::vector<R2::Mesh *> meshes;
-
-  if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-  {
-    std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
-    return meshes;
-  }
 
   for (unsigned int i = 0; i < scene->mNumMeshes; i++)
   {
@@ -34,7 +35,7 @@ std::vector<R2::Mesh *> R2::Model::loadFromFile(std::string fileName, Shader *p_
     R2::Mesh *model = new R2::Mesh();
     if (mesh->mName.C_Str())
     {
-      model->setName(std::string(mesh->mName.C_Str()));
+      model->setName(mesh->mName.C_Str());
     }
     else
     {
@@ -165,6 +166,7 @@ std::vector<R2::Mesh *> R2::Model::loadFromFile(std::string fileName, Shader *p_
       R2::Texture *texture = new R2::Texture(m_papplication->getUtils()->getFilePath("/resources/default.png"), GL_TEXTURE_2D, GL_TEXTURE0, GL_UNSIGNED_BYTE);
       texture->setup();
       texture->texUnit(p_shader, "material.diffuse", 0);
+      texture->setIsDiffuse(true);
       texture->setShininess(1.0f);
       meshes[i]->addTexture(texture);
     }

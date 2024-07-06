@@ -1,6 +1,6 @@
 #include <iostream>
 #include <glad/glad.h>
-#include <R2/Shader/VAO.h>
+#include <R2/shader/VAO.h>
 
 R2::VAO::VAO()
 {

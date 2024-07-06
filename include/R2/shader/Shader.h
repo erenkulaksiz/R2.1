@@ -33,7 +33,7 @@ namespace R2
     std::string m_vertexPath;
     std::string m_fragmentPath;
     std::string m_geometryPath = "";
-    GLuint m_ID;
+    GLuint m_ID = -1;
   };
 };
 

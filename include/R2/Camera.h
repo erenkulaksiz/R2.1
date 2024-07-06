@@ -39,6 +39,10 @@ namespace R2
     void setScale(glm::vec3 scale) override;
     glm::vec3 getDirection();
     glm::vec3 getUp();
+    void setSpeed(float speed);
+    void setSensitivity(float sensitivity);
+    float getSpeed();
+    float getSensitivity();
 
   private:
     Application *m_papplication;
