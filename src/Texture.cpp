@@ -1,24 +1,28 @@
+#include <thread>
 #include <glad/glad.h>
 #include <iostream>
 #include <string>
 #include <R2/Texture.h>
+#include <R2/Application.h>
 
-R2::Texture::Texture(std::string imagePath, GLenum texType, GLenum slot, GLenum pixelType)
+R2::Texture::Texture(Application* p_application, std::string imagePath, GLenum texType, GLenum slot, GLenum pixelType)
 {
   std::cout << "Texture::Texture() " << imagePath << std::endl;
   this->m_texType = texType;
   this->m_imagePath = imagePath;
   this->m_slot = slot;
   this->m_pixelType = pixelType;
+  this->m_papplication = p_application;
 }
 
-R2::Texture::Texture(GLenum texType, GLenum slot, GLenum pixelType)
+R2::Texture::Texture(Application* p_application, GLenum texType, GLenum slot, GLenum pixelType)
 {
   std::cout << "Texture::Texture() " << m_imagePath << std::endl;
   this->m_texType = texType;
   this->m_imagePath = m_imagePath;
   this->m_slot = slot;
   this->m_pixelType = pixelType;
+  this->m_papplication = p_application;
 }
 
 R2::Texture::~Texture()
@@ -27,12 +31,23 @@ R2::Texture::~Texture()
   cleanup();
 }
 
+void R2::Texture::load()
+{
+  std::cout << "Texture::load()" << std::endl;
+
+  m_bytes = m_papplication->getAssetManager()->loadTexture(m_imagePath.c_str(), m_width, m_height, m_numColCh);
+  m_isLoaded = true;
+}
+
 void R2::Texture::setup()
 {
   std::cout << "Texture::setup()" << std::endl;
-  int widthImg, heightImg, numColCh;
-  stbi_set_flip_vertically_on_load(true);
-  unsigned char *bytes = stbi_load(m_imagePath.data(), &widthImg, &heightImg, &numColCh, 0);
+
+  if(!m_isLoaded)
+  {
+    std::cerr << "Texture::setup() texture not loaded" << std::endl;
+    return;
+  }
 
   glGenTextures(1, &m_ID);
   glActiveTexture(m_slot);
@@ -45,18 +60,18 @@ void R2::Texture::setup()
   glTexParameteri(m_texType, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
   GLenum format = GL_RED;
-  if (numColCh == 1)
+  if (m_numColCh == 1)
     format = GL_RED;
-  else if (numColCh == 3)
+  else if (m_numColCh == 3)
     format = GL_RGB;
-  else if (numColCh == 4)
+  else if (m_numColCh == 4)
     format = GL_RGBA;
 
   // float flatColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
   // glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, flatColor);
-  glTexImage2D(m_texType, 0, format, widthImg, heightImg, 0, format, m_pixelType, bytes);
+  glTexImage2D(m_texType, 0, format, m_width, m_height, 0, format, m_pixelType, m_bytes);
   glGenerateMipmap(m_texType);
-  stbi_image_free(bytes);
+  m_papplication->getAssetManager()->textureFreeBytes(m_bytes);
   glBindTexture(m_texType, 0);
 }
 
@@ -131,4 +146,14 @@ void R2::Texture::setShininess(float value)
 float R2::Texture::getShininess()
 {
   return m_shininess;
+}
+
+void R2::Texture::setIsLoaded(bool value)
+{
+  m_isLoaded = value;
+}
+
+bool R2::Texture::getIsLoaded()
+{
+  return m_isLoaded;
 }

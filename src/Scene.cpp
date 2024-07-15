@@ -50,18 +50,6 @@ std::vector<R2::Mesh *> R2::Scene::getMeshes()
   return m_meshes;
 }
 
-void R2::Scene::addLineMeshes()
-{
-  Mesh *xLineMesh = lineMesh(glm::vec3(0.0f), glm::vec3(5.0f, 0.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-  addMesh(xLineMesh);
-
-  Mesh *yLineMesh = lineMesh(glm::vec3(0.0f), glm::vec3(0.0f, 5.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-  addMesh(yLineMesh);
-
-  Mesh *zLineMesh = lineMesh(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, 5.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-  addMesh(zLineMesh);
-}
-
 void R2::Scene::addMesh(Mesh *mesh)
 {
   if (mesh->getIsLight())
@@ -143,27 +131,6 @@ void R2::Scene::loop()
   }
 }
 
-R2::Mesh *R2::Scene::lineMesh(glm::vec3 start, glm::vec3 end, glm::vec4 color)
-{
-  float lineVertices[6] = {
-      start.x, start.y, start.z,
-      end.x, end.y, end.z};
-
-  unsigned int lineIndices[2] = {
-      0, 1};
-
-  Mesh *p_lineMesh = new Mesh(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), m_papplication->getRenderer()->getBoundingBoxShader());
-  p_lineMesh->setName("LineMesh");
-  p_lineMesh->setIsLine(true);
-  p_lineMesh->setVertices(lineVertices, sizeof(lineVertices));
-  p_lineMesh->setIndices(lineIndices, sizeof(lineIndices));
-  p_lineMesh->setColor(color);
-  p_lineMesh->setIsVisibleOnMenu(false);
-  p_lineMesh->setup();
-
-  return p_lineMesh;
-}
-
 void R2::Scene::cleanup()
 {
   std::cout << "Scene::cleanup() " << m_name << std::endl;
@@ -194,56 +161,6 @@ std::vector<R2::Camera *> R2::Scene::getCameras()
   return cameras;
 }
 
-void R2::Scene::addGridMesh()
-{
-  float gridSize = 300.0f;
-  int divisions = 100;
-  
-  float halfSize = gridSize / 2.0f;
-  float step = gridSize / static_cast<float>(divisions);
-
-  std::vector<float> vertices;
-  std::vector<unsigned int> indices;
-
-  for (int i = -divisions / 2; i <= divisions / 2; ++i)
-  {
-    vertices.push_back(static_cast<float>(i) * step);
-    vertices.push_back(0.0f);
-    vertices.push_back(-halfSize);
-
-    vertices.push_back(static_cast<float>(i) * step);
-    vertices.push_back(0.0f);
-    vertices.push_back(halfSize);
-  }
-
-  for (int i = -divisions / 2; i <= divisions / 2; ++i)
-  {
-    vertices.push_back(-halfSize);
-    vertices.push_back(0.0f);
-    vertices.push_back(static_cast<float>(i) * step);
-
-    vertices.push_back(halfSize);
-    vertices.push_back(0.0f);
-    vertices.push_back(static_cast<float>(i) * step);
-  }
-
-  for (size_t i = 0; i < vertices.size() / 3; ++i)
-  {
-    indices.push_back(static_cast<unsigned int>(i));
-  }
-
-  Mesh *p_gridMesh = new Mesh(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f), m_papplication->getRenderer()->getBoundingBoxShader());
-  p_gridMesh->setName("GridMesh");
-  p_gridMesh->setIsLine(true);
-  p_gridMesh->setVertices(vertices.data(), vertices.size() * sizeof(float));
-  p_gridMesh->setIndices(indices.data(), indices.size() * sizeof(unsigned int));
-  p_gridMesh->setColor(glm::vec4(0.5f, 0.5f, 0.5f, 0.3f));
-  p_gridMesh->setIsVisibleOnMenu(false);
-  p_gridMesh->setup();
-
-  addMesh(p_gridMesh);
-}
-
 R2::Mesh *R2::Scene::getMesh(std::string name)
 {
   for (Mesh *mesh : m_meshes)
@@ -265,8 +182,6 @@ void R2::Scene::setup()
 {
   std::cout << "Scene::setup()" << std::endl;
 
-  glfwMakeContextCurrent(m_papplication->getSharedWindow());
-
   if (m_isStartedSetup)
   {
     std::cout << "Scene::setup() Already started setup" << std::endl;
@@ -275,11 +190,6 @@ void R2::Scene::setup()
 
   m_isSetup = false;
   m_isStartedSetup = true;
-
-#ifdef __R2_DEBUG
-  addLineMeshes();
-  addGridMesh();
-#endif
 
   std::vector<rapidxml::xml_node<> *> objectNodes = m_papplication->getConfig()->getObjectNodes(m_name);
 

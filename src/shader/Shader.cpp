@@ -61,8 +61,8 @@ R2::Shader::~Shader()
 void R2::Shader::setup(Application *p_application)
 {
   std::cout << "Shader::setup()" << m_vertexPath << std::endl;
-  std::string vertexCode = p_application->getUtils()->getFileContents(m_vertexPath.data());
-  std::string fragmentCode = p_application->getUtils()->getFileContents(m_fragmentPath.data());
+  std::string vertexCode = p_application->getAssetManager()->getFileContents(m_vertexPath.data());
+  std::string fragmentCode = p_application->getAssetManager()->getFileContents(m_fragmentPath.data());
 
   const char *vertexSource = vertexCode.data();
   const char *fragmentSource = fragmentCode.data();
@@ -79,7 +79,7 @@ void R2::Shader::setup(Application *p_application)
   GLuint geometryShader;
   if (m_geometryPath != "")
   {
-    std::string geometryCode = p_application->getUtils()->getFileContents(m_geometryPath.data());
+    std::string geometryCode = p_application->getAssetManager()->getFileContents(m_geometryPath.data());
     const char *geometrySource = geometryCode.data();
     geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
     std::cout << "Shader::setup() geometryshader " << geometryShader << std::endl;

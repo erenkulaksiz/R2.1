@@ -9,6 +9,8 @@
 #include <R2/Renderer.h>
 #include <R2/Light.h>
 #include <R2/MeshGroup.h>
+#include <R2/Imguizmo.h>
+#include <glm/gtc/type_ptr.hpp>
 
 R2::Imgui::Imgui(Application *m_papplication)
 {
@@ -88,6 +90,7 @@ void R2::Imgui::render()
 {
   newFrame();
   drawGui();
+  m_papplication->getImguizmo()->loop();
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -116,6 +119,70 @@ void R2::Imgui::drawGui()
     ImGui::Text("setting up current scene...");
     ImGui::End();
     return;
+  }
+
+  ImGuizmo::OPERATION gizmoOperation = m_papplication->getImguizmo()->getGizmoOperation();
+  if (ImGui::RadioButton("translate", gizmoOperation == ImGuizmo::TRANSLATE))
+  {
+    m_papplication->getImguizmo()->setGizmoOperation(ImGuizmo::TRANSLATE);
+  }
+  ImGui::SameLine();
+  if (ImGui::RadioButton("rotate", gizmoOperation == ImGuizmo::ROTATE))
+  {
+    m_papplication->getImguizmo()->setGizmoOperation(ImGuizmo::ROTATE);
+  }
+  ImGui::SameLine();
+  if (ImGui::RadioButton("scale", gizmoOperation == ImGuizmo::SCALE))
+  {
+    m_papplication->getImguizmo()->setGizmoOperation(ImGuizmo::SCALE);
+    m_papplication->getImguizmo()->setGizmoMode(ImGuizmo::LOCAL);
+  }
+
+  if (gizmoOperation != ImGuizmo::SCALE)
+  {
+    ImGuizmo::MODE gizmoMode = m_papplication->getImguizmo()->getGizmoMode();
+    if (ImGui::RadioButton("local", gizmoMode == ImGuizmo::LOCAL))
+    {
+      m_papplication->getImguizmo()->setGizmoMode(ImGuizmo::LOCAL);
+    }
+    ImGui::SameLine();
+    if (ImGui::RadioButton("world", gizmoMode == ImGuizmo::WORLD))
+    {
+      m_papplication->getImguizmo()->setGizmoMode(ImGuizmo::WORLD);
+    }
+  }
+
+  bool useSnap = m_papplication->getImguizmo()->getUseSnap();
+  if (ImGui::Checkbox("Snap", &useSnap))
+  {
+    m_papplication->getImguizmo()->setUseSnap(useSnap);
+  }
+
+  ImGui::SameLine();
+  glm::vec3 snapTranslation = m_papplication->getImguizmo()->getSnapTranslation();
+  float snapRotation = m_papplication->getImguizmo()->getSnapRotation();
+  glm::vec3 snapScale = m_papplication->getImguizmo()->getSnapScale();
+
+  switch (m_papplication->getImguizmo()->getGizmoOperation())
+  {
+  case ImGuizmo::TRANSLATE:
+    ImGui::InputFloat3("Snap", glm::value_ptr(snapTranslation));
+    m_papplication->getImguizmo()->setSnapValues(snapTranslation, snapRotation, snapScale);
+    break;
+  case ImGuizmo::ROTATE:
+    ImGui::InputFloat("Angle Snap", &snapRotation);
+    m_papplication->getImguizmo()->setSnapValues(snapTranslation, snapRotation, snapScale);
+    break;
+  case ImGuizmo::SCALE:
+    ImGui::InputFloat3("Scale Snap", glm::value_ptr(snapScale));
+    m_papplication->getImguizmo()->setSnapValues(snapTranslation, snapRotation, snapScale);
+    break;
+  }
+
+  bool boundSizing = m_papplication->getImguizmo()->getBoundSizing();
+  if (ImGui::Checkbox("Bound Sizing", &boundSizing))
+  {
+    m_papplication->getImguizmo()->setBoundSizing(boundSizing);
   }
 
   if (ImGui::CollapsingHeader("statistics"))

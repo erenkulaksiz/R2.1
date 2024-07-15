@@ -10,6 +10,8 @@
 #include <R2/Input.h>
 #include <R2/Config.h>
 #include <R2/Utils.h>
+#include <R2/AssetManager.h>
+#include <R2/Imguizmo.h>
 
 namespace R2
 {
@@ -19,6 +21,8 @@ namespace R2
   class Config;
   class Renderer;
   class Shader;
+  class AssetManager;
+  class Imguizmo;
 
   class Application
   {
@@ -44,17 +48,19 @@ namespace R2
     unsigned int getScreenWidth();
     unsigned int getScreenHeight();
     int getFrameCount();
-    GLFWwindow *getSharedWindow();
+    AssetManager *getAssetManager();
+    Imguizmo *getImguizmo();
 
   private:
     GLFWwindow *m_pwindow;
-    GLFWwindow *m_psharedWindow;
     Imgui *m_pimgui;
     SceneManager *m_psceneManager;
     Input *m_pinput;
     Config *m_pconfig;
     Utils *m_putils;
     Renderer *m_prenderer;
+    AssetManager *m_passetManager;
+    Imguizmo* m_pimguizmo;
     const char *p_mtitle = "R2";
     unsigned int m_screenWidth;
     unsigned int m_screenHeight;

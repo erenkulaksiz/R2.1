@@ -8,7 +8,7 @@ R2::Config::Config(Application *p_application)
 
   try
   {
-    this->appXML = m_papplication->getUtils()->getFileContents(m_papplication->getUtils()->getFilePath("/app.xml"));
+    this->appXML = m_papplication->getAssetManager()->getFileContents(m_papplication->getUtils()->getFilePath("/app.xml"));
 
     if (this->appXML.empty())
     {

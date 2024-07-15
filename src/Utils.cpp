@@ -39,26 +39,6 @@ std::string R2::Utils::getFilePath(std::string path)
   return (m_executableFolder + path);
 }
 
-std::string R2::Utils::getFileContents(std::string filename)
-{
-  std::FILE *fp = std::fopen(filename.data(), "rb");
-  std::cout << "getFileContents() filename: " << filename << std::endl;
-  if (fp)
-  {
-    std::cout << "getFileContents() Reading file: " << filename << std::endl;
-    std::string contents;
-    std::fseek(fp, 0, SEEK_END);
-    contents.resize(std::ftell(fp));
-    std::rewind(fp);
-    std::fread(&contents[0], 1, contents.size(), fp);
-    std::fclose(fp);
-    return (contents);
-  }
-
-  std::cout << "getFileContents() Failed to read file: " << filename << std::endl;
-  return "";
-}
-
 glm::vec3 R2::Utils::stringToVec3(std::string vec3String)
 {
   if(vec3String == "")

@@ -65,6 +65,12 @@ void R2::Mesh::setup()
 {
   std::cout << "R2::Mesh::setup()" << std::endl;
 
+  if(m_isSetup)
+  {
+    std::cout << "R2::Mesh::setup() already setup " << m_name << std::endl;
+    return;
+  }
+
   std::cout << "R2::Mesh::setup() vertexCount: " << m_vertexCount << std::endl;
   std::cout << "R2::Mesh::setup() indexCount: " << m_indexCount << std::endl;
 
@@ -88,6 +94,8 @@ void R2::Mesh::setup()
   m_pvao->unbind();
   m_pvbo->unbind();
   m_pebo->unbind();
+
+  m_isSetup = true;
 }
 
 void R2::Mesh::setVertices(float* vertices, size_t vertexCount)
@@ -159,7 +167,7 @@ std::string R2::Mesh::getName()
 
 void R2::Mesh::render(Camera* p_camera, Scene* p_scene)
 {
-  if (m_isCamera || !m_isVisible)
+  if (m_isCamera || !m_isVisible || !m_isSetup)
   {
     return;
   }
@@ -299,6 +307,11 @@ glm::vec4 R2::Mesh::getColor()
 
 void R2::Mesh::addTexture(Texture* p_texture)
 {
+  if (!p_texture->getIsLoaded())
+  {
+    p_texture->load();
+  }
+
   m_ptextures.push_back(p_texture);
 }
 
@@ -705,4 +718,19 @@ glm::vec3 R2::Mesh::calculatePenetration(Mesh* p_mesh) {
   }
 
   return glm::vec3(0.0f);
+}
+
+bool R2::Mesh::getIsSetup()
+{
+  return m_isSetup;
+}
+
+void R2::Mesh::setRotationQuaternion(glm::quat rotation)
+{
+  m_rotation = glm::degrees(glm::eulerAngles(rotation));
+}
+
+glm::quat R2::Mesh::getRotationQuaternion()
+{
+  return glm::quat(glm::radians(m_rotation));
 }

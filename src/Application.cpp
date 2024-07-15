@@ -1,10 +1,12 @@
-#include <iostream>
+ #include <iostream>
 #include <R2/Application.h>
 #include <R2/Imgui.h>
 #include <R2/Utils.h>
 #include <R2/SceneManager.h>
 #include <R2/Renderer.h>
 #include <R2/Camera.h>
+#include <R2/AssetManager.h>
+#include <R2/Imguizmo.h>
 
 R2::Application::Application()
 {
@@ -39,8 +41,6 @@ bool R2::Application::setup()
   glfwMakeContextCurrent(m_pwindow);
   glfwShowWindow(m_pwindow);
 
-  m_psharedWindow = glfwCreateWindow(1, 1, p_mtitle, NULL, m_pwindow);
-
   if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress))
   {
 	  std::cout << "Failed to initialize GLAD" << std::endl;
@@ -67,6 +67,9 @@ bool R2::Application::setup()
   m_pimgui = new Imgui(this);
   m_pinput = new Input(this);
   m_pconfig = new Config(this);
+  m_passetManager = new AssetManager(this);
+
+  m_pimguizmo = new Imguizmo(this);
 
   m_psceneManager = new SceneManager(this);
   m_psceneManager->loadScenes();
@@ -255,7 +258,12 @@ int R2::Application::getFrameCount()
   return m_frameCount;
 }
 
-GLFWwindow *R2::Application::getSharedWindow()
+R2::AssetManager *R2::Application::getAssetManager()
 {
-  return m_psharedWindow;
+  return m_passetManager;
+}
+
+R2::Imguizmo *R2::Application::getImguizmo()
+{
+  return m_pimguizmo;
 }

@@ -28,7 +28,8 @@ R2::Billboard::Billboard(Application *p_application, std::string imagePath) : Me
   p_shader->setup(m_papplication);
   setShader(p_shader);
 
-  Texture *p_texture = new Texture(imagePath, GL_TEXTURE_2D, GL_TEXTURE0, GL_UNSIGNED_BYTE);
+  Texture *p_texture = new Texture(m_papplication, imagePath, GL_TEXTURE_2D, GL_TEXTURE0, GL_UNSIGNED_BYTE);
+  p_texture->load();
   p_texture->setup();
   p_texture->setIsDiffuse(true);
   p_texture->texUnit(p_shader, "tex0", 0);

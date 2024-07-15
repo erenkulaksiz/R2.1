@@ -1,5 +1,4 @@
 #include <iostream>
-#include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include <R2/Model.h>
@@ -16,8 +15,9 @@ std::vector<R2::Mesh *> R2::Model::loadFromFile(std::string fileName, Shader *p_
 {
   std::cout << "Model::loadFromFile()" << std::endl;
 
-  Assimp::Importer importer;
-  const aiScene* scene = importer.ReadFile(fileName, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate);
+  const std::pair<Assimp::Importer*, const aiScene*> result = m_papplication->getAssetManager()->loadModel(fileName, p_shader);
+  Assimp::Importer* importer = result.first;
+  const aiScene* scene = result.second;
 
   if (!scene)
   {
@@ -61,7 +61,8 @@ std::vector<R2::Mesh *> R2::Model::loadFromFile(std::string fileName, Shader *p_
 
         std::cout << "diffuse texture path: " << textureFilePath << std::endl;
 
-        R2::Texture *texture = new R2::Texture(textureFilePath, GL_TEXTURE_2D, GL_TEXTURE0, GL_UNSIGNED_BYTE);
+        R2::Texture *texture = new R2::Texture(m_papplication, textureFilePath, GL_TEXTURE_2D, GL_TEXTURE0, GL_UNSIGNED_BYTE);
+        texture->load();
         texture->setup();
         texture->texUnit(p_shader, "material.diffuse", 0);
         texture->setShininess(1.0f);
@@ -75,7 +76,8 @@ std::vector<R2::Mesh *> R2::Model::loadFromFile(std::string fileName, Shader *p_
 
         std::cout << "normal texture path: " << textureFilePath << std::endl;
 
-        R2::Texture* texture = new R2::Texture(textureFilePath, GL_TEXTURE_2D, GL_TEXTURE1, GL_UNSIGNED_BYTE);
+        R2::Texture* texture = new R2::Texture(m_papplication, textureFilePath, GL_TEXTURE_2D, GL_TEXTURE1, GL_UNSIGNED_BYTE);
+        texture->load();
         texture->setup();
         texture->texUnit(p_shader, "material.normal", 1);
         texture->setShininess(1.0f);
@@ -163,7 +165,8 @@ std::vector<R2::Mesh *> R2::Model::loadFromFile(std::string fileName, Shader *p_
   {
     if (meshes[i]->getTextures().size() == 0)
     {
-      R2::Texture *texture = new R2::Texture(m_papplication->getUtils()->getFilePath("/resources/default.png"), GL_TEXTURE_2D, GL_TEXTURE0, GL_UNSIGNED_BYTE);
+      R2::Texture *texture = new R2::Texture(m_papplication, m_papplication->getUtils()->getFilePath("/resources/default.png"), GL_TEXTURE_2D, GL_TEXTURE0, GL_UNSIGNED_BYTE);
+      texture->load();
       texture->setup();
       texture->texUnit(p_shader, "material.diffuse", 0);
       texture->setIsDiffuse(true);

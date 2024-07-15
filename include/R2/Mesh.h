@@ -91,6 +91,9 @@ namespace R2
     void setIsStatic(bool isStatic);
     bool getIsStatic();
     glm::vec3 calculatePenetration(Mesh *p_mesh);
+    bool getIsSetup();
+    virtual void setRotationQuaternion(glm::quat rotation);
+    glm::quat getRotationQuaternion();
 
   protected:
     Shader* m_pshader = nullptr;
@@ -123,6 +126,7 @@ namespace R2
     bool m_isGroup = false;
     bool m_isDirectionalLight = false;
     bool m_isDrawingBoundingBox = false;
+    bool m_isSetup = false;
     std::string m_name;
     void setShaderLightValues(std::vector<Light *> p_lights, std::string lightType);
     glm::vec3 m_boundingBoxMin = glm::vec3(0.0f);

@@ -13,13 +13,8 @@ I had to convert this project to CMake, because writing it in VSCode was a pain.
 - Debugging tools (ImGui)
 - Config manager
 - Scene serialization via XML
-- Lighting
+- Lighting & Shadows
 - Model & Texture loader with Assimp
-
-## Planned Features
-
-- Shadows
-- Physics engine
 
 ## Dependencies
 
@@ -32,3 +27,4 @@ I had to convert this project to CMake, because writing it in VSCode was a pain.
 - [assimp](https://github.com/assimp/assimp)
 - [khronos](https://www.khronos.org/registry/OpenGL/index_gl.php)
 - [wai](https://github.com/gpakosz/whereami)
+- [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo/tree/master)

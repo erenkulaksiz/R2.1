@@ -16,6 +16,7 @@ namespace R2
     void cleanup() override;
     void setPosition(glm::vec3 position) override;
     void setRotation(glm::vec3 rotation) override;
+    void setRotationQuaternion(glm::quat rotation) override;
     void setScale(glm::vec3 scale) override;
     void renderDirectionalShadowMap(Shader *p_shader, glm::mat4 lightSpaceMatrix) override;
     void renderPointShadowMap(Shader *p_shader, std::vector<glm::mat4> lightSpaceMatrix, glm::vec3 lightPos, float farPlane) override;

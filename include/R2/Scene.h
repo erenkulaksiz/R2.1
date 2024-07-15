@@ -31,15 +31,12 @@ namespace R2
     void cleanup();
     void loop();
     std::vector<Mesh *> getMeshes();
-    void addLineMeshes();
     void addMesh(Mesh *mesh);
     void setCamera(Camera *p_camera);
     Camera *getCamera();
     std::vector<Camera *> getCameras();
-    void addGridMesh();
     Mesh *getMesh(std::string name);
     Mesh *getMesh(int index);
-    Mesh *lineMesh(glm::vec3 start, glm::vec3 end, glm::vec4 color);
     void setup();
     void reload();
     void setClearColor(glm::vec4 clearColor);

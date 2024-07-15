@@ -132,3 +132,23 @@ void R2::MeshGroup::setIsDrawingBoundingBox(bool isDrawingBoundingBox)
     m_meshes[i]->setIsDrawingBoundingBox(isDrawingBoundingBox);
   }
 }
+
+void R2::MeshGroup::setRotationQuaternion(glm::quat rotation)
+{
+  glm::quat oldRotationQuat = glm::quat(glm::radians(m_rotation));
+  glm::quat newRotationQuat = rotation;
+  glm::quat rotationOffset = glm::inverse(oldRotationQuat) * newRotationQuat;
+
+  m_rotation = glm::degrees(glm::eulerAngles(rotation));
+
+  for (size_t i = 0; i < m_meshes.size(); i++)
+  {
+    glm::vec3 relativePosition = m_meshes[i]->getPosition() - m_position;
+    relativePosition = rotationOffset * relativePosition;
+    m_meshes[i]->setPosition(m_position + relativePosition);
+
+    glm::quat meshRotation = glm::quat(glm::radians(m_meshes[i]->getRotation()));
+    meshRotation = rotationOffset * meshRotation;
+    m_meshes[i]->setRotation(glm::degrees(glm::eulerAngles(meshRotation)));
+  }
+}
