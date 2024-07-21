@@ -36,6 +36,7 @@ namespace R2
     glm::vec3 m_snapTranslation = glm::vec3(5.0f);
     float m_snapRotation = 5.0f;
     glm::vec3 m_snapScale = glm::vec3(5.0f);
+    void decomposeMatrix(const glm::mat4& matrix, glm::vec3& translation, glm::quat& rotation, glm::vec3& scale);
   };
 }
 

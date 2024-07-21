@@ -2,7 +2,9 @@
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include <R2/Camera.h>
+#include <R2/Raycast.h>
 
 R2::Camera::Camera(Application *p_application) : Mesh()
 {
@@ -69,6 +71,8 @@ glm::mat4 R2::Camera::getProjectionMatrix()
 
 void R2::Camera::loop()
 {
+  getRaycastHitObject();
+
   if (!m_isActive)
   {
     updateMatrix();
@@ -315,4 +319,34 @@ float R2::Camera::getSpeed()
 float R2::Camera::getSensitivity()
 {
   return m_sensitivity;
+}
+
+void R2::Camera::setProjection(glm::mat4 projection)
+{
+  m_projection = projection;
+}
+
+void R2::Camera::setIsFirstMouse(bool isFirstMouse)
+{
+  m_isFirstMouse = isFirstMouse;
+}
+
+bool R2::Camera::getIsFirstMouse()
+{
+  return m_isFirstMouse;
+}
+
+R2::Mesh* R2::Camera::getRaycastHitObject()
+{
+  R2::Raycast raycast(m_papplication);
+  raycast.setOrigin(m_position);
+  raycast.setDirection(m_cameraFront);
+  Mesh* hitMesh = raycast.castRay();
+
+  if (hitMesh) {
+    std::cout << "Hit object: " << hitMesh->getName() << m_papplication->getCurrentFrame() << std::endl;
+    return hitMesh;
+  }
+
+  return nullptr;
 }

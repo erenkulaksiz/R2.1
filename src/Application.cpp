@@ -62,6 +62,10 @@ bool R2::Application::setup()
   glEnable(GL_TEXTURE_CUBE_MAP);
   glEnable(GL_FRAMEBUFFER_SRGB);
 
+  int maxTextureUnits;
+  glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
+  std::cout << "Max Texture Units: " << maxTextureUnits << std::endl;
+
   m_putils = new Utils();
   m_prenderer = new Renderer(this);
   m_pimgui = new Imgui(this);

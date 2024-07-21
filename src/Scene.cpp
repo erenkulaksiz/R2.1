@@ -93,7 +93,7 @@ void R2::Scene::loop()
 
   if (m_isSetup)
   {
-    if (m_papplication->getFrameCount() % 4 == 0)
+    if (m_papplication->getFrameCount() % 2 == 0)
     {
       for (Light* p_directionalLights : m_directionalLights)
       {

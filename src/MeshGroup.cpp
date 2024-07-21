@@ -12,6 +12,12 @@ R2::MeshGroup::MeshGroup() : Mesh()
 R2::MeshGroup::~MeshGroup()
 {
   std::cout << "R2::MeshGroup::~MeshGroup()" << std::endl;
+
+  for(Mesh *mesh : m_meshes)
+  {
+    //mesh->cleanup();
+  }
+
   cleanup();
 }
 
@@ -53,8 +59,8 @@ void R2::MeshGroup::setRotation(glm::vec3 rotation)
 {
   glm::quat oldRotationQuat = glm::quat(glm::radians(m_rotation));
   glm::quat newRotationQuat = glm::quat(glm::radians(rotation));
-  glm::quat rotationOffset = glm::inverse(oldRotationQuat) * newRotationQuat;
-  
+  glm::quat rotationOffset = newRotationQuat * glm::inverse(oldRotationQuat);
+
   m_rotation = rotation;
 
   for (size_t i = 0; i < m_meshes.size(); i++)
@@ -62,7 +68,6 @@ void R2::MeshGroup::setRotation(glm::vec3 rotation)
     glm::vec3 relativePosition = m_meshes[i]->getPosition() - m_position;
     relativePosition = rotationOffset * relativePosition;
     m_meshes[i]->setPosition(m_position + relativePosition);
-
     glm::quat meshRotation = glm::quat(glm::radians(m_meshes[i]->getRotation()));
     meshRotation = rotationOffset * meshRotation;
     m_meshes[i]->setRotation(glm::degrees(glm::eulerAngles(meshRotation)));
@@ -137,18 +142,17 @@ void R2::MeshGroup::setRotationQuaternion(glm::quat rotation)
 {
   glm::quat oldRotationQuat = glm::quat(glm::radians(m_rotation));
   glm::quat newRotationQuat = rotation;
-  glm::quat rotationOffset = glm::inverse(oldRotationQuat) * newRotationQuat;
+  glm::quat rotationOffset = newRotationQuat * glm::inverse(oldRotationQuat);
 
-  m_rotation = glm::degrees(glm::eulerAngles(rotation));
+  m_rotation = glm::degrees(glm::eulerAngles(newRotationQuat));
 
   for (size_t i = 0; i < m_meshes.size(); i++)
   {
     glm::vec3 relativePosition = m_meshes[i]->getPosition() - m_position;
     relativePosition = rotationOffset * relativePosition;
     m_meshes[i]->setPosition(m_position + relativePosition);
-
-    glm::quat meshRotation = glm::quat(glm::radians(m_meshes[i]->getRotation()));
+    glm::quat meshRotation = m_meshes[i]->getRotationQuaternion();
     meshRotation = rotationOffset * meshRotation;
-    m_meshes[i]->setRotation(glm::degrees(glm::eulerAngles(meshRotation)));
+    m_meshes[i]->setRotationQuaternion(meshRotation);
   }
 }

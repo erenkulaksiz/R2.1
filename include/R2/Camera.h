@@ -43,6 +43,10 @@ namespace R2
     void setSensitivity(float sensitivity);
     float getSpeed();
     float getSensitivity();
+    void setProjection(glm::mat4 projection);
+    void setIsFirstMouse(bool isFirstMouse);
+    bool getIsFirstMouse();
+    Mesh* getRaycastHitObject();
 
   private:
     Application *m_papplication;

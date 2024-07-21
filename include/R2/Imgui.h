@@ -52,6 +52,7 @@ namespace R2
     void renderScenes(std::vector<Scene *> scenes);
     void renderMeshTextures(Mesh *p_mesh);
     void renderAddMesh();
+    void setupTheme();
   };
 }
 

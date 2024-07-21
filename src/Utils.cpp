@@ -100,3 +100,49 @@ bool R2::Utils::stringToBool(std::string boolString)
 {
   return (boolString == "true");
 }
+
+glm::vec2 R2::Utils::screenToNDC(const glm::vec2& screenPos, float screenWidth, float screenHeight) 
+{
+  return glm::vec2((2.0f * screenPos.x) / screenWidth - 1.0f, 1.0f - (2.0f * screenPos.y) / screenHeight);
+}
+
+glm::vec4 R2::Utils::ndcToClip(const glm::vec2& ndcPos) 
+{
+  return glm::vec4(ndcPos.x, ndcPos.y, -1.0f, 1.0f);
+}
+
+glm::vec4 R2::Utils::clipToView(const glm::vec4& clipPos, const glm::mat4& inverseProjection) 
+{
+  return inverseProjection * clipPos;
+}
+
+glm::vec4 R2::Utils::viewToWorld(const glm::vec4& viewPos, const glm::mat4& inverseView) 
+{
+  return inverseView * viewPos;
+}
+
+bool R2::Utils::rayIntersectsAABB(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, const glm::vec3& minBound, const glm::vec3& maxBound, float& tMin, float& tMax) 
+{
+  glm::vec3 invDir = 1.0f / rayDirection;
+  glm::vec3 t0s = (minBound - rayOrigin) * invDir;
+  glm::vec3 t1s = (maxBound - rayOrigin) * invDir;
+
+  glm::vec3 t0 = glm::min(t0s, t1s);
+  glm::vec3 t1 = glm::max(t0s, t1s);
+
+  tMin = glm::max(glm::max(t0.x, t0.y), t0.z);
+  tMax = glm::min(glm::min(t1.x, t1.y), t1.z);
+
+  return tMax >= tMin && tMax > 0;
+}
+
+glm::vec2 R2::Utils::worldToScreen(const glm::vec3& worldPos, const glm::mat4& viewMatrix, const glm::mat4& projMatrix, int screenWidth, int screenHeight)
+{
+  glm::vec4 clipSpacePos = projMatrix * viewMatrix * glm::vec4(worldPos, 1.0f);
+  glm::vec3 ndcSpacePos = glm::vec3(clipSpacePos) / clipSpacePos.w;
+
+  glm::vec2 screenPos;
+  screenPos.x = (ndcSpacePos.x + 1.0f) / 2.0f * screenWidth;
+  screenPos.y = (1.0f - ndcSpacePos.y) / 2.0f * screenHeight;
+  return screenPos;
+}

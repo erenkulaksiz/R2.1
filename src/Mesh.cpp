@@ -2,6 +2,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <R2/Mesh.h>
 #include <R2/Camera.h>
@@ -187,9 +188,7 @@ void R2::Mesh::render(Camera* p_camera, Scene* p_scene)
 
   glm::mat4 model = glm::mat4(1.0f);
   model = glm::translate(model, m_position);
-  model = glm::rotate(model, glm::radians(m_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-  model = glm::rotate(model, glm::radians(m_rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-  model = glm::rotate(model, glm::radians(m_rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+  model *= glm::toMat4(glm::quat(glm::radians(m_rotation)));
   model = glm::scale(model, m_scale);
 
   m_pshader->setMat4("model", model);
@@ -237,9 +236,7 @@ void R2::Mesh::renderDirectionalShadowMap(Shader* p_shader, glm::mat4 lightSpace
 
   glm::mat4 model = glm::mat4(1.0f);
   model = glm::translate(model, m_position);
-  model = glm::rotate(model, glm::radians(m_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-  model = glm::rotate(model, glm::radians(m_rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-  model = glm::rotate(model, glm::radians(m_rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+  model *= glm::toMat4(glm::quat(glm::radians(m_rotation)));
   model = glm::scale(model, m_scale);
 
   p_shader->setMat4("model", model);
@@ -258,9 +255,7 @@ void R2::Mesh::renderPointShadowMap(Shader* p_shader, std::vector<glm::mat4> lig
 
   glm::mat4 model = glm::mat4(1.0f);
   model = glm::translate(model, m_position);
-  model = glm::rotate(model, glm::radians(m_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-  model = glm::rotate(model, glm::radians(m_rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-  model = glm::rotate(model, glm::radians(m_rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+  model *= glm::toMat4(glm::quat(glm::radians(m_rotation)));
   model = glm::scale(model, m_scale);
 
   p_shader->setVec3("lightPos", lightPos);
@@ -483,9 +478,7 @@ void R2::Mesh::drawBoundingBox(Scene *p_scene)
 {
   glm::mat4 model = glm::mat4(1.0f);
   model = glm::translate(model, m_position);
-  model = glm::rotate(model, glm::radians(m_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-  model = glm::rotate(model, glm::radians(m_rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-  model = glm::rotate(model, glm::radians(m_rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+  model *= glm::toMat4(glm::quat(glm::radians(m_rotation)));
   model = glm::scale(model, m_scale);
 
   glm::vec3 min = m_boundingBoxMin;
@@ -725,12 +718,12 @@ bool R2::Mesh::getIsSetup()
   return m_isSetup;
 }
 
-void R2::Mesh::setRotationQuaternion(glm::quat rotation)
-{
-  m_rotation = glm::degrees(glm::eulerAngles(rotation));
-}
-
 glm::quat R2::Mesh::getRotationQuaternion()
 {
   return glm::quat(glm::radians(m_rotation));
+}
+
+void R2::Mesh::setRotationQuaternion(glm::quat rotation)
+{
+  m_rotation = glm::degrees(glm::eulerAngles(rotation));
 }
