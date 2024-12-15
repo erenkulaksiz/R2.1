@@ -69,6 +69,31 @@ void R2::Light::setup()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
   }
+  else if (m_isSpotLight)
+  {
+    glGenFramebuffers(1, &m_depthMapFBO);
+
+    glGenTextures(1, &m_depthMap);
+    glBindTexture(GL_TEXTURE_2D, m_depthMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_shadowWidth, m_shadowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthMap, 0);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+      std::cerr << "Spot light framebuffer is not complete!" << std::endl;
+    }
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+  }
 
   std::cout << "R2::Light::Light() - m_depthMapFBO: " << m_depthMapFBO << std::endl;
   std::cout << "R2::Light::Light() - m_depthMap: " << m_depthMap << std::endl;
@@ -161,8 +186,8 @@ void R2::Light::updateDirectionalShadowMap(Shader *p_shader, Camera *p_camera)
   glm::vec3 min = glm::vec3(FLT_MAX, FLT_MAX, FLT_MAX);
   glm::vec3 max = glm::vec3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-  std::vector<Mesh*> meshes = m_papplication->getSceneManager()->getCurrentScene()->getMeshes();
-  for (Mesh* p_mesh : meshes)
+  std::vector<Mesh *> meshes = m_papplication->getSceneManager()->getCurrentScene()->getMeshes();
+  for (Mesh *p_mesh : meshes)
   {
     if (p_mesh->getIsCamera() || p_mesh->getIsBillboard())
       continue;
@@ -172,13 +197,19 @@ void R2::Light::updateDirectionalShadowMap(Shader *p_shader, Camera *p_camera)
       glm::vec3 meshMin = p_mesh->getBoundingBoxMin();
       glm::vec3 meshMax = p_mesh->getBoundingBoxMax();
 
-      if (meshMin.x < min.x) min.x = meshMin.x;
-      if (meshMin.y < min.y) min.y = meshMin.y;
-      if (meshMin.z < min.z) min.z = meshMin.z;
+      if (meshMin.x < min.x)
+        min.x = meshMin.x;
+      if (meshMin.y < min.y)
+        min.y = meshMin.y;
+      if (meshMin.z < min.z)
+        min.z = meshMin.z;
 
-      if (meshMax.x > max.x) max.x = meshMax.x;
-      if (meshMax.y > max.y) max.y = meshMax.y;
-      if (meshMax.z > max.z) max.z = meshMax.z;
+      if (meshMax.x > max.x)
+        max.x = meshMax.x;
+      if (meshMax.y > max.y)
+        max.y = meshMax.y;
+      if (meshMax.z > max.z)
+        max.z = meshMax.z;
     }
   }
 
@@ -199,7 +230,7 @@ void R2::Light::updateDirectionalShadowMap(Shader *p_shader, Camera *p_camera)
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void R2::Light::updatePointShadowMap(Shader* p_shader, Camera* p_camera, int lightIndex)
+void R2::Light::updatePointShadowMap(Shader *p_shader, Camera *p_camera, int lightIndex)
 {
   m_lightProjection = glm::perspective(glm::radians(90.0f), (float)m_shadowWidth / (float)m_shadowHeight, m_nearPlane, m_farPlane);
   m_lightSpaceMatrices.clear();
@@ -218,6 +249,11 @@ void R2::Light::updatePointShadowMap(Shader* p_shader, Camera* p_camera, int lig
   m_papplication->getRenderer()->renderPointShadowMap(p_shader, m_papplication->getSceneManager()->getCurrentScene(), m_lightSpaceMatrices, m_position, m_farPlane);
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void R2::Light::updateSpotShadowMap(Shader *p_shader, Camera *p_camera)
+{
+  // TODO
 }
 
 glm::mat4 R2::Light::getLightSpaceMatrix() const
@@ -273,4 +309,24 @@ GLuint R2::Light::getDepthMapFBO() const
 GLuint R2::Light::getDepthCubemap() const
 {
   return m_depthCubemap;
+}
+
+void R2::Light::setCutOff(float cutOffDegrees)
+{
+  m_cutOff = glm::cos(glm::radians(cutOffDegrees));
+}
+
+float R2::Light::getCutOff() const
+{
+  return glm::degrees(glm::acos(m_cutOff));
+}
+
+void R2::Light::setOuterCutOff(float outerCutOffDegrees)
+{
+  m_outerCutOff = glm::cos(glm::radians(outerCutOffDegrees));
+}
+
+float R2::Light::getOuterCutOff() const
+{
+  return glm::degrees(glm::acos(m_outerCutOff));
 }

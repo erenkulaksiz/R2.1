@@ -34,8 +34,9 @@ namespace R2
     void setQuadratic(float quadratic);
     void setDirection(glm::vec3 direction);
     glm::vec3 getDirection() const;
-    void updateDirectionalShadowMap(Shader* p_shader, Camera* p_camera);
-    void updatePointShadowMap(Shader* p_shader, Camera* p_camera, int lightIndex);
+    void updateDirectionalShadowMap(Shader *p_shader, Camera *p_camera);
+    void updatePointShadowMap(Shader *p_shader, Camera *p_camera, int lightIndex);
+    void updateSpotShadowMap(Shader *p_shader, Camera *p_camera);
     glm::mat4 getLightSpaceMatrix() const;
     GLuint getDepthMap() const;
     void setNearPlane(float nearPlane);
@@ -45,6 +46,10 @@ namespace R2
     std::vector<glm::mat4> getLightSpaceMatrices() const;
     GLuint getDepthMapFBO() const;
     GLuint getDepthCubemap() const;
+    void setCutOff(float cutOffDegrees);
+    float getCutOff() const;
+    void setOuterCutOff(float outerCutOffDegrees);
+    float getOuterCutOff() const;
 
   private:
     Application *m_papplication;
@@ -67,6 +72,8 @@ namespace R2
     std::vector<glm::mat4> m_lightSpaceMatrices;
     float m_nearPlane = 1.0f;
     float m_farPlane = 100.0f;
+    float m_cutOff = glm::cos(glm::radians(12.5f));
+    float m_outerCutOff = glm::cos(glm::radians(17.5f));
   };
 }
 

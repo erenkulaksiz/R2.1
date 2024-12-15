@@ -10,7 +10,7 @@
 #include <R2/MeshGroup.h>
 #include <R2/Renderer.h>
 
-R2::Mesh::Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, float* p_vertices, unsigned int* p_indices, size_t vertexCount, size_t indexCount, Shader* p_shader)
+R2::Mesh::Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, float *p_vertices, unsigned int *p_indices, size_t vertexCount, size_t indexCount, Shader *p_shader)
 {
   std::cout << "R2::Mesh::Mesh()" << std::endl;
   m_position = position;
@@ -23,7 +23,7 @@ R2::Mesh::Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, float* p
   m_pshader = p_shader;
 }
 
-R2::Mesh::Mesh(glm::vec3 position, float* p_vertices, unsigned int* p_indices, size_t vertexCount, size_t indexCount, Shader* p_shader)
+R2::Mesh::Mesh(glm::vec3 position, float *p_vertices, unsigned int *p_indices, size_t vertexCount, size_t indexCount, Shader *p_shader)
 {
   std::cout << "R2::Mesh::Mesh()" << std::endl;
   m_position = position;
@@ -36,7 +36,7 @@ R2::Mesh::Mesh(glm::vec3 position, float* p_vertices, unsigned int* p_indices, s
   m_pshader = p_shader;
 }
 
-R2::Mesh::Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, Shader* p_shader)
+R2::Mesh::Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, Shader *p_shader)
 {
   std::cout << "R2::Mesh::Mesh()" << std::endl;
   m_position = position;
@@ -45,7 +45,7 @@ R2::Mesh::Mesh(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale, Shader* 
   m_pshader = p_shader;
 }
 
-R2::Mesh::Mesh(Shader* p_shader)
+R2::Mesh::Mesh(Shader *p_shader)
 {
   std::cout << "R2::Mesh::Mesh()" << std::endl;
   m_pshader = p_shader;
@@ -66,7 +66,7 @@ void R2::Mesh::setup()
 {
   std::cout << "R2::Mesh::setup()" << std::endl;
 
-  if(m_isSetup)
+  if (m_isSetup)
   {
     std::cout << "R2::Mesh::setup() already setup " << m_name << std::endl;
     return;
@@ -77,7 +77,7 @@ void R2::Mesh::setup()
 
   m_pvao = new VAO();
   m_pvao->bind();
-  
+
   m_pvbo = new VBO(m_pvertices, m_vertexCount);
   m_pebo = new EBO(m_pindices, m_indexCount);
 
@@ -87,9 +87,9 @@ void R2::Mesh::setup()
   }
   else
   {
-    m_pvao->linkAttrib(*m_pvbo, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
-    m_pvao->linkAttrib(*m_pvbo, 1, 2, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    m_pvao->linkAttrib(*m_pvbo, 2, 3, GL_FLOAT, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    m_pvao->linkAttrib(*m_pvbo, 0, 3, GL_FLOAT, 8 * sizeof(float), (void *)0);
+    m_pvao->linkAttrib(*m_pvbo, 1, 2, GL_FLOAT, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+    m_pvao->linkAttrib(*m_pvbo, 2, 3, GL_FLOAT, 8 * sizeof(float), (void *)(5 * sizeof(float)));
   }
 
   m_pvao->unbind();
@@ -99,13 +99,13 @@ void R2::Mesh::setup()
   m_isSetup = true;
 }
 
-void R2::Mesh::setVertices(float* vertices, size_t vertexCount)
+void R2::Mesh::setVertices(float *vertices, size_t vertexCount)
 {
   this->m_pvertices = vertices;
   this->m_vertexCount = vertexCount;
 }
 
-void R2::Mesh::setIndices(unsigned int* indices, size_t indexCount)
+void R2::Mesh::setIndices(unsigned int *indices, size_t indexCount)
 {
   this->m_pindices = indices;
   this->m_indexCount = indexCount;
@@ -141,7 +141,7 @@ glm::vec3 R2::Mesh::getScale()
   return m_scale;
 }
 
-R2::Shader* R2::Mesh::getShader()
+R2::Shader *R2::Mesh::getShader()
 {
   return m_pshader;
 }
@@ -166,7 +166,7 @@ std::string R2::Mesh::getName()
   return m_name;
 }
 
-void R2::Mesh::render(Camera* p_camera, Scene* p_scene)
+void R2::Mesh::render(Camera *p_camera, Scene *p_scene)
 {
   if (m_isCamera || !m_isVisible || !m_isSetup)
   {
@@ -196,11 +196,11 @@ void R2::Mesh::render(Camera* p_camera, Scene* p_scene)
   m_pshader->setMat4("projection", p_camera->getProjectionMatrix());
   m_pshader->setVec4("color", m_color);
   m_pshader->setVec3("camPos", p_camera->getPosition());
-  
+
   for (size_t i = 0; i < m_ptextures.size(); i++)
   {
     m_ptextures[i]->bind();
-    
+
     if (m_ptextures[i]->getShininess())
     {
       m_pshader->setFloat("material.shininess", m_ptextures[i]->getShininess());
@@ -226,7 +226,7 @@ void R2::Mesh::render(Camera* p_camera, Scene* p_scene)
   glDrawElements(m_isLine ? GL_LINES : GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
 }
 
-void R2::Mesh::renderDirectionalShadowMap(Shader* p_shader, glm::mat4 lightSpaceMatrix)
+void R2::Mesh::renderDirectionalShadowMap(Shader *p_shader, glm::mat4 lightSpaceMatrix)
 {
   if (m_isCamera || !m_isVisible || m_isLight || m_isLine || m_isBillboard)
     return;
@@ -245,7 +245,7 @@ void R2::Mesh::renderDirectionalShadowMap(Shader* p_shader, glm::mat4 lightSpace
   glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
 }
 
-void R2::Mesh::renderPointShadowMap(Shader* p_shader, std::vector<glm::mat4> lightSpaceMatrix, glm::vec3 lightPos, float farPlane)
+void R2::Mesh::renderPointShadowMap(Shader *p_shader, std::vector<glm::mat4> lightSpaceMatrix, glm::vec3 lightPos, float farPlane)
 {
   if (m_isCamera || !m_isVisible || m_isLight || m_isLine || m_isBillboard)
     return;
@@ -270,7 +270,7 @@ void R2::Mesh::renderPointShadowMap(Shader* p_shader, std::vector<glm::mat4> lig
   glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
 }
 
-void R2::Mesh::setShader(Shader* p_shader)
+void R2::Mesh::setShader(Shader *p_shader)
 {
   m_pshader = p_shader;
 }
@@ -300,7 +300,7 @@ glm::vec4 R2::Mesh::getColor()
   return m_color;
 }
 
-void R2::Mesh::addTexture(Texture* p_texture)
+void R2::Mesh::addTexture(Texture *p_texture)
 {
   if (!p_texture->getIsLoaded())
   {
@@ -344,7 +344,7 @@ void R2::Mesh::cleanup()
 
   if (m_pshader != nullptr)
   {
-    //delete m_pshader;
+    // delete m_pshader;
   }
 
   if (m_pvao != nullptr)
@@ -370,6 +370,16 @@ bool R2::Mesh::getIsPointLight()
   return m_isPointLight;
 }
 
+void R2::Mesh::setIsSpotLight(bool isSpotLight)
+{
+  m_isSpotLight = isSpotLight;
+}
+
+bool R2::Mesh::getIsSpotLight()
+{
+  return m_isSpotLight;
+}
+
 void R2::Mesh::setIsLight(bool isLight)
 {
   m_isLight = isLight;
@@ -390,7 +400,7 @@ int R2::Mesh::getFaceCount()
   return (m_vertexCount / 64 / 2);
 }
 
-std::vector<R2::Texture*> R2::Mesh::getTextures()
+std::vector<R2::Texture *> R2::Mesh::getTextures()
 {
   return m_ptextures;
 }
@@ -410,7 +420,7 @@ bool R2::Mesh::getIsDirectionalLight()
   return m_isDirectionalLight;
 }
 
-void R2::Mesh::setShaderLightValues(std::vector<Light*> p_lights, std::string lightType)
+void R2::Mesh::setShaderLightValues(std::vector<Light *> p_lights, std::string lightType)
 {
   for (int i = 0; i < p_lights.size(); i++)
   {
@@ -485,30 +495,28 @@ void R2::Mesh::drawBoundingBox(Scene *p_scene)
   glm::vec3 max = m_boundingBoxMax;
 
   glm::vec3 vertices[] = {
-    glm::vec3(min.x, min.y, min.z),
-    glm::vec3(max.x, min.y, min.z),
-    glm::vec3(max.x, max.y, min.z),
-    glm::vec3(min.x, max.y, min.z),
-    glm::vec3(min.x, min.y, max.z),
-    glm::vec3(max.x, min.y, max.z),
-    glm::vec3(max.x, max.y, max.z),
-    glm::vec3(min.x, max.y, max.z)
-  };
+      glm::vec3(min.x, min.y, min.z),
+      glm::vec3(max.x, min.y, min.z),
+      glm::vec3(max.x, max.y, min.z),
+      glm::vec3(min.x, max.y, min.z),
+      glm::vec3(min.x, min.y, max.z),
+      glm::vec3(max.x, min.y, max.z),
+      glm::vec3(max.x, max.y, max.z),
+      glm::vec3(min.x, max.y, max.z)};
 
   unsigned int indices[] = {
-    0, 1,
-    1, 2,
-    2, 3,
-    3, 0,
-    4, 5,
-    5, 6,
-    6, 7,
-    7, 4,
-    0, 4,
-    1, 5,
-    2, 6,
-    3, 7
-  };
+      0, 1,
+      1, 2,
+      2, 3,
+      3, 0,
+      4, 5,
+      5, 6,
+      6, 7,
+      7, 4,
+      0, 4,
+      1, 5,
+      2, 6,
+      3, 7};
 
   GLuint VAO, VBO, EBO;
   glGenVertexArrays(1, &VAO);
@@ -523,10 +531,10 @@ void R2::Mesh::drawBoundingBox(Scene *p_scene)
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
 
-  Shader* p_shader = p_scene->getApplication()->getRenderer()->getBoundingBoxShader();
+  Shader *p_shader = p_scene->getApplication()->getRenderer()->getBoundingBoxShader();
   p_shader->activate();
   p_shader->setMat4("model", model);
   p_shader->setMat4("view", p_scene->getCamera()->getViewMatrix());
@@ -562,7 +570,7 @@ void R2::Mesh::applyForce(glm::vec3 force)
 
 void R2::Mesh::updatePhysics(float deltaTime, glm::vec3 gravity, std::vector<Mesh *> p_meshes)
 {
-  if(!m_hasPhysics || m_isStatic)
+  if (!m_hasPhysics || m_isStatic)
   {
     return;
   }
@@ -573,7 +581,7 @@ void R2::Mesh::updatePhysics(float deltaTime, glm::vec3 gravity, std::vector<Mes
   m_velocity += m_acceleration * deltaTime;
   m_position += m_velocity * deltaTime;
 
-  for(Mesh *mesh : p_meshes)
+  for (Mesh *mesh : p_meshes)
   {
     if (mesh == this)
     {
@@ -582,19 +590,22 @@ void R2::Mesh::updatePhysics(float deltaTime, glm::vec3 gravity, std::vector<Mes
 
     if (mesh->getHasPhysics())
     {
-      if(isColliding(mesh))
+      if (isColliding(mesh))
       {
         if (mesh->getIsStatic())
         {
           glm::vec3 penetration = calculatePenetration(mesh);
 
-          if (abs(penetration.x) > 0) {
+          if (abs(penetration.x) > 0)
+          {
             m_velocity.x = 0;
           }
-          if (abs(penetration.y) > 0) {
+          if (abs(penetration.y) > 0)
+          {
             m_velocity.y = 0;
           }
-          if (abs(penetration.z) > 0) {
+          if (abs(penetration.z) > 0)
+          {
             m_velocity.z = 0;
           }
         }
@@ -651,7 +662,7 @@ void R2::Mesh::setVelocity(glm::vec3 velocity)
   m_velocity = velocity;
 }
 
-bool R2::Mesh::isColliding(Mesh* p_mesh)
+bool R2::Mesh::isColliding(Mesh *p_mesh)
 {
   if (m_position.x + m_boundingBoxMax.x < p_mesh->getPosition().x + p_mesh->getBoundingBoxMin().x ||
       m_position.x + m_boundingBoxMin.x > p_mesh->getPosition().x + p_mesh->getBoundingBoxMax().x)
@@ -684,7 +695,8 @@ bool R2::Mesh::getIsStatic()
   return m_isStatic;
 }
 
-glm::vec3 R2::Mesh::calculatePenetration(Mesh* p_mesh) {
+glm::vec3 R2::Mesh::calculatePenetration(Mesh *p_mesh)
+{
   glm::vec3 thisMin = m_position + m_boundingBoxMin;
   glm::vec3 thisMax = m_position + m_boundingBoxMax;
   glm::vec3 otherMin = p_mesh->getPosition() + p_mesh->getBoundingBoxMin();
@@ -698,14 +710,18 @@ glm::vec3 R2::Mesh::calculatePenetration(Mesh* p_mesh) {
   float yOverlap = (thisMax.y - thisMin.y) / 2.0f + (otherMax.y - otherMin.y) / 2.0f - abs(distance.y);
   float zOverlap = (thisMax.z - thisMin.z) / 2.0f + (otherMax.z - otherMin.z) / 2.0f - abs(distance.z);
 
-  if (xOverlap > 0 && yOverlap > 0 && zOverlap > 0) {
-    if (xOverlap < yOverlap && xOverlap < zOverlap) {
+  if (xOverlap > 0 && yOverlap > 0 && zOverlap > 0)
+  {
+    if (xOverlap < yOverlap && xOverlap < zOverlap)
+    {
       return glm::vec3(distance.x < 0 ? -xOverlap : xOverlap, 0.0f, 0.0f);
     }
-    else if (yOverlap < xOverlap && yOverlap < zOverlap) {
+    else if (yOverlap < xOverlap && yOverlap < zOverlap)
+    {
       return glm::vec3(0.0f, distance.y < 0 ? -yOverlap : yOverlap, 0.0f);
     }
-    else {
+    else
+    {
       return glm::vec3(0.0f, 0.0f, distance.z < 0 ? -zOverlap : zOverlap);
     }
   }

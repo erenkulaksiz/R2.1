@@ -71,7 +71,7 @@ glm::mat4 R2::Camera::getProjectionMatrix()
 
 void R2::Camera::loop()
 {
-  getRaycastHitObject();
+  // getRaycastHitObject();
 
   if (!m_isActive)
   {
@@ -336,14 +336,15 @@ bool R2::Camera::getIsFirstMouse()
   return m_isFirstMouse;
 }
 
-R2::Mesh* R2::Camera::getRaycastHitObject()
+R2::Mesh *R2::Camera::getRaycastHitObject()
 {
   R2::Raycast raycast(m_papplication);
   raycast.setOrigin(m_position);
   raycast.setDirection(m_cameraFront);
-  Mesh* hitMesh = raycast.castRay();
+  Mesh *hitMesh = raycast.castRay();
 
-  if (hitMesh) {
+  if (hitMesh)
+  {
     std::cout << "Hit object: " << hitMesh->getName() << m_papplication->getCurrentFrame() << std::endl;
     return hitMesh;
   }

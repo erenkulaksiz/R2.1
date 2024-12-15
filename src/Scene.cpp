@@ -419,6 +419,10 @@ void R2::Scene::setupLightObject(rapidxml::xml_node<>* objectNode)
     {
       p_light->setIsDirectionalLight(true);
     }
+    else if (type == "spot")
+    {
+      p_light->setIsSpotLight(true);
+    }
   }
 
   if (objectNode->first_attribute("color") != nullptr)

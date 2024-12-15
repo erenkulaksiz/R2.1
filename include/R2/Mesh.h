@@ -71,12 +71,14 @@ namespace R2
     void setIsGroup(bool isGroup);
     void setIsDirectionalLight(bool isDirectionalLight);
     bool getIsDirectionalLight();
+    void setIsSpotLight(bool isSpotlight);
+    bool getIsSpotLight();
     glm::vec3 getBoundingBoxMin();
     glm::vec3 getBoundingBoxMax();
     virtual void setIsDrawingBoundingBox(bool isDrawingBoundingBox);
     bool getIsDrawingBoundingBox();
     void setBoundingBox(glm::vec3 min, glm::vec3 max);
-    virtual void drawBoundingBox(Scene* p_scene);
+    virtual void drawBoundingBox(Scene *p_scene);
     void applyForce(glm::vec3 force);
     void updatePhysics(float deltaTime, glm::vec3 gravity, std::vector<Mesh *> p_meshes);
     void setMass(float mass);
@@ -96,7 +98,7 @@ namespace R2
     glm::quat getRotationQuaternion();
 
   protected:
-    Shader* m_pshader = nullptr;
+    Shader *m_pshader = nullptr;
     std::vector<Texture *> m_ptextures;
     glm::vec3 m_position = glm::vec3(0.0f);
     glm::vec3 m_rotation = glm::vec3(0.0f);
@@ -108,9 +110,9 @@ namespace R2
     bool m_isAffectedByGravity = true;
     bool m_hasPhysics = false;
     bool m_isStatic = false;
-    VAO* m_pvao = nullptr;
-    VBO* m_pvbo = nullptr;
-    EBO* m_pebo = nullptr;
+    VAO *m_pvao = nullptr;
+    VBO *m_pvbo = nullptr;
+    EBO *m_pebo = nullptr;
     bool m_setupBoundingBox = false;
     float *m_pvertices;
     unsigned int *m_pindices;
@@ -125,6 +127,7 @@ namespace R2
     bool m_isPointLight = false;
     bool m_isGroup = false;
     bool m_isDirectionalLight = false;
+    bool m_isSpotLight = false;
     bool m_isDrawingBoundingBox = false;
     bool m_isSetup = false;
     std::string m_name;

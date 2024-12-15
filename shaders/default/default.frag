@@ -44,6 +44,7 @@ struct DirectionalLight {
 
 #define MAX_POINT_LIGHTS 5
 #define MAX_DIRECTIONAL_LIGHTS 1
+#define MAX_SPOT_LIGHTS 5
 
 uniform int numberOfPointLights;
 uniform int numberOfDirectionalLights;
